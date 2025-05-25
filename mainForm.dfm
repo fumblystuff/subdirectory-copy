@@ -97,6 +97,7 @@ object frmMain: TfrmMain
       Text = ''
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
+      OnChange = editRootDirectoryChange
       AltBtnNumGlyphs = 1
       ButtonNumGlyphs = 1
       OnButtonClick = editRootDirectoryButtonClick

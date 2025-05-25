@@ -56,7 +56,6 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ReadConfiguration;
     procedure SaveConfiguration;
-    procedure SetStartButtonState;
     procedure btnAddSourceDirectoryClick(Sender: TObject);
     procedure btnRemoveSourceDirectoryClick(Sender: TObject);
     procedure ActionSourceItemSelectionChangeExecute(Sender: TObject);
@@ -68,6 +67,8 @@ type
     procedure btnCloseClick(Sender: TObject);
     procedure editRootDirectoryButtonClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
+    procedure editRootDirectoryChange(Sender: TObject);
+    procedure setButtonState;
   private
     { Private declarations }
   public
@@ -123,8 +124,9 @@ begin
     CreatePathStr(listSourceDirectories.items));
 end;
 
-procedure TfrmMain.SetStartButtonState;
+procedure TfrmMain.setButtonState;
 begin
+  btnAddSourceDirectory.Enabled := Length(editRootDirectory.text) > 0;
   btnStart.Enabled := (Length(editRootDirectory.text) > 0) and
     (listSourceDirectories.items.count > 0);
 end;
@@ -150,7 +152,7 @@ begin
     if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
       listSourceDirectories.Add(tmpPath);
       UpdateSourceFolderCaption();
-      SetStartButtonState();
+      setButtonState();
     end else begin
       MessageDialogCentered('Item already exists');
     end;
@@ -161,13 +163,13 @@ procedure TfrmMain.btnClearSourceDirectoriesClick(Sender: TObject);
 begin
   listSourceDirectories.Clear;
   UpdateSourceFolderCaption();
-  SetStartButtonState();
+  setButtonState();
 end;
 
 procedure TfrmMain.btnRemoveSourceDirectoryClick(Sender: TObject);
 begin
   listSourceDirectories.Delete(listSourceDirectories.ItemIndex);
-  SetStartButtonState();
+  setButtonState();
 end;
 
 procedure TfrmMain.btnStartClick(Sender: TObject);
@@ -191,6 +193,11 @@ begin
   if RzSelectFolderDialog.Execute then begin
     editRootDirectory.text := RzSelectFolderDialog.SelectedPathName;
   end;
+end;
+
+procedure TfrmMain.editRootDirectoryChange(Sender: TObject);
+begin
+  setButtonState();
 end;
 
 procedure TfrmMain.btnSettingsClick(Sender: TObject);
@@ -221,7 +228,7 @@ procedure TfrmMain.WMDropFiles(var Msg: TWMDropFiles);
 var
   attrs: DWORD;
   i, NumFiles, FilenameLength: integer;
-  s, tmpPath: string;
+  s, rootPath, tmpPath: string;
 begin
   NumFiles := DragQueryFile(Msg.Drop, $FFFFFFFF, nil, 0);
   for i := 0 to NumFiles - 1 do begin
@@ -234,6 +241,7 @@ begin
       MessageDialogCentered('Invalid file attributes');
       Exit;
     end else if (attrs and FILE_ATTRIBUTE_DIRECTORY) <> 0 then begin
+      rootPath := editRootDirectory.text;
       tmpPath := ExtractFileName(s);
       if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
         listSourceDirectories.Add(ExtractFileName(tmpPath));
@@ -242,7 +250,7 @@ begin
   end;
   DragFinish(Msg.Drop);
   UpdateSourceFolderCaption();
-  SetStartButtonState();
+  setButtonState();
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
