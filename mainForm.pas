@@ -48,6 +48,9 @@ type
     RzStatusPaneVersion: TRzVersionInfoStatus;
     RzStatusPaneSpacer: TRzStatusPane;
     editRootDirectory: TRzButtonEdit;
+    RzSpacer3: TRzSpacer;
+    btnHelp: TRzToolButton;
+    RzLauncherMain: TRzLauncher;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -64,6 +67,7 @@ type
     procedure btnSettingsClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
     procedure editRootDirectoryButtonClick(Sender: TObject);
+    procedure btnHelpClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -203,6 +207,13 @@ begin
   SaveConfiguration();
   RzFormState.SaveState;
   Application.Terminate;
+end;
+
+procedure TfrmMain.btnHelpClick(Sender: TObject);
+begin
+  // launch the docs in the default browser
+  RzLauncherMain.FileName := 'https://docs.fumblydiddle.com/subcopy';
+  RzLauncherMain.Launch;
 end;
 
 procedure TfrmMain.WMDropFiles(var Msg: TWMDropFiles);

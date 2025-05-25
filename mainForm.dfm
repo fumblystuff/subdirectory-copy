@@ -78,6 +78,7 @@ object frmMain: TfrmMain
     Padding.Right = 10
     Padding.Bottom = 10
     TabOrder = 1
+    ExplicitWidth = 622
     DesignSize = (
       624
       36)
@@ -99,6 +100,7 @@ object frmMain: TfrmMain
       AltBtnNumGlyphs = 1
       ButtonNumGlyphs = 1
       OnButtonClick = editRootDirectoryButtonClick
+      ExplicitWidth = 513
     end
   end
   object RzToolbar: TRzToolbar
@@ -111,7 +113,7 @@ object frmMain: TfrmMain
     BorderOuter = fsGroove
     BorderSides = [sdTop]
     BorderWidth = 0
-    Caption = 'itunes'
+    Caption = 'Help'
     TabOrder = 2
     ExplicitWidth = 622
     ToolbarControls = (
@@ -119,6 +121,8 @@ object frmMain: TfrmMain
       RzSpacer1
       btnSettings
       RzSpacer2
+      btnHelp
+      RzSpacer3
       btnClose)
     object btnStart: TRzToolButton
       Left = 4
@@ -152,7 +156,7 @@ object frmMain: TfrmMain
       Top = 2
     end
     object btnClose: TRzToolButton
-      Left = 120
+      Left = 165
       Top = 2
       Width = 50
       Images = ImageList
@@ -161,6 +165,19 @@ object frmMain: TfrmMain
       UseToolbarShowCaption = False
       Caption = '&Close'
       OnClick = btnCloseClick
+    end
+    object RzSpacer3: TRzSpacer
+      Left = 157
+      Top = 2
+    end
+    object btnHelp: TRzToolButton
+      Left = 120
+      Top = 2
+      Width = 37
+      ShowCaption = True
+      UseToolbarShowCaption = False
+      Caption = 'Help'
+      OnClick = btnHelpClick
     end
   end
   object RzPanel3: TRzPanel
@@ -171,9 +188,8 @@ object frmMain: TfrmMain
     Align = alClient
     BorderOuter = fsNone
     TabOrder = 3
-    ExplicitTop = 173
     ExplicitWidth = 622
-    ExplicitHeight = 241
+    ExplicitHeight = 349
     DesignSize = (
       624
       357)
@@ -199,7 +215,7 @@ object frmMain: TfrmMain
       OnEnter = ActionSourceItemSelectionChangeExecute
       OnExit = ActionSourceItemSelectionChangeExecute
       ExplicitWidth = 516
-      ExplicitHeight = 204
+      ExplicitHeight = 312
     end
     object btnAddSourceDirectory: TRzButton
       Left = 537
@@ -208,6 +224,7 @@ object frmMain: TfrmMain
       Caption = 'Add'
       TabOrder = 1
       OnClick = btnAddSourceDirectoryClick
+      ExplicitLeft = 535
     end
     object btnRemoveSourceDirectory: TRzButton
       Left = 537
@@ -259,5 +276,11 @@ object frmMain: TfrmMain
   object ImageList: TImageList
     Left = 440
     Top = 224
+  end
+  object RzLauncherMain: TRzLauncher
+    Action = 'Open'
+    Timeout = -1
+    Left = 232
+    Top = 280
   end
 end
