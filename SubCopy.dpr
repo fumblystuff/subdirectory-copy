@@ -14,7 +14,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'MSFCopy';
+  Application.Title := 'SubCopy';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmStart, frmStart);
   Application.CreateForm(TfrmProcessing, frmProcessing);

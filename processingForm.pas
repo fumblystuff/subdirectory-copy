@@ -5,16 +5,14 @@ interface
 uses
   globals, utils,
 
-  CodesiteLogging,
-
-  RzPanel, RzDlgBtn, RzEdit,
+  RzPanel, RzDlgBtn, RzEdit, RzLaunch,
 
   System.SysUtils, System.Variants, System.Classes, System.IOUtils,
 
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls,
   Vcl.StdCtrls,
 
-  Winapi.Windows, Winapi.Messages, RzLaunch;
+  Winapi.Windows, Winapi.Messages;
 
 type
   TfrmProcessing = class(TForm)
@@ -146,7 +144,6 @@ begin
     memoOutput.lines.Append(Format('Folders skipped: %d', [skippedFiles]));
 
     if copiedFiles > 0 then begin
-
       operationOption := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
         keyOperation, 'Copy');
       processingOption := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
@@ -173,8 +170,8 @@ begin
       ErrorOutput('Cancelling operation, no files to copy');
     end;
   end;
+
   sourceFolderList.Free;
-  // enable the cancel button, because we're done
   ProcessingDialogButtons.EnableCancel := true;
 end;
 

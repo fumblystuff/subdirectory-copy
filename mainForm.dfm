@@ -83,15 +83,15 @@ object frmMain: TfrmMain
       36)
     object labelRootDirectory: TLabel
       Left = 10
-      Top = 10
+      Top = 14
       Width = 76
       Height = 15
       Caption = 'Root Directory'
     end
     object editRootDirectory: TRzButtonEdit
-      Left = 92
-      Top = 6
-      Width = 510
+      Left = 95
+      Top = 10
+      Width = 515
       Height = 23
       Text = ''
       Anchors = [akLeft, akTop, akRight]
@@ -99,7 +99,6 @@ object frmMain: TfrmMain
       AltBtnNumGlyphs = 1
       ButtonNumGlyphs = 1
       OnButtonClick = editRootDirectoryButtonClick
-      ExplicitWidth = 520
     end
   end
   object RzToolbar: TRzToolbar
