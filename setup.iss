@@ -14,7 +14,8 @@ InfoBeforeFile=about.txt
 Compression=lzma2
 SolidCompression=yes
 OutputDir=installer
-OutputBaseFilename=SubCopySetup-{#SetupSetting("AppVersion")}
+; OutputBaseFilename=SubCopySetup-{#SetupSetting("AppVersion")}
+OutputBaseFilename=SubCopy Setup
 SetupIconFile=subcopy_Icon.ico
 ArchitecturesInstallIn64BitMode=x64Compatible
 
