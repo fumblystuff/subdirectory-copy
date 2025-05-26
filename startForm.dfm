@@ -12,7 +12,6 @@ object frmStart: TfrmStart
   Font.Style = []
   Position = poOwnerFormCenter
   OnActivate = FormActivate
-  OnClose = FormClose
   TextHeight = 15
   object labelTargetDrive: TRzLabel
     Left = 68
@@ -73,9 +72,9 @@ object frmStart: TfrmStart
     Height = 26
     DriveTypes = [dtUnknown, dtRemovable, dtRemote]
     Offset = 4
+    OnDriveChange = TargetDriveDriveChange
     ItemHeight = 20
     TabOrder = 1
-    OnChange = TargetDriveChange
   end
   object selectOperation: TRzComboBox
     Left = 140
@@ -124,11 +123,5 @@ object frmStart: TfrmStart
     Height = 17
     Caption = 'Close TeraCopy after operation'
     TabOrder = 4
-  end
-  object DriveTimer: TTimer
-    Enabled = False
-    OnTimer = DriveTimerTimer
-    Left = 64
-    Top = 96
   end
 end

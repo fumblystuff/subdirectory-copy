@@ -4,7 +4,7 @@ AppPublisher=Fumbly Diddle Software
 AppPublisherURL=https://www.fumblydiddle.com/
 AppContact=support@fumblydiddle.com
 AppSupportURL=https://fumblydiddle.com/support/
-AppVersion=1.0.0
+AppVersion=1.0.5
 VersionInfoVersion={#SetupSetting("AppVersion")}
 WizardStyle=modern
 DefaultDirName={autopf}\Fumbly Diddle Software\subcopy
@@ -15,7 +15,7 @@ Compression=lzma2
 SolidCompression=yes
 OutputDir=installer
 ; OutputBaseFilename=SubCopySetup-{#SetupSetting("AppVersion")}
-OutputBaseFilename=SubCopy Setup
+OutputBaseFilename=SubCopySetup-{#SetupSetting("AppVersion")}
 SetupIconFile=subcopy_Icon.ico
 ArchitecturesInstallIn64BitMode=x64Compatible
 

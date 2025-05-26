@@ -228,7 +228,7 @@ procedure TfrmMain.WMDropFiles(var Msg: TWMDropFiles);
 var
   attrs: DWORD;
   i, NumFiles, FilenameLength: integer;
-  s, rootPath, tmpPath: string;
+  filePath, s, rootPath, tmpPath: string;
 begin
   NumFiles := DragQueryFile(Msg.Drop, $FFFFFFFF, nil, 0);
   for i := 0 to NumFiles - 1 do begin
@@ -241,11 +241,17 @@ begin
       MessageDialogCentered('Invalid file attributes');
       Exit;
     end else if (attrs and FILE_ATTRIBUTE_DIRECTORY) <> 0 then begin
-      rootPath := editRootDirectory.text;
-      tmpPath := ExtractFileName(s);
-      if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
-        listSourceDirectories.Add(ExtractFileName(tmpPath));
-      end
+      rootPath := IncludeTrailingBackslash(editRootDirectory.text);
+      filePath := ExtractFilePath(s);
+      if rootPath = filePath then begin
+        tmpPath := ExtractFileName(s);
+        if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
+          listSourceDirectories.Add(ExtractFileName(tmpPath));
+        end;
+      end else begin
+        MessageDialogCentered('Dropped folder(s) do not match Root Directory');
+        Exit;
+      end;
     end;
   end;
   DragFinish(Msg.Drop);
@@ -255,7 +261,7 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
-  RzVersionInfo.FilePath := Application.ExeName;
+  RzVersionInfo.filePath := Application.ExeName;
   RzRegIniFile.path := AppRegistryKey;
   ReadConfiguration();
   UpdateSourceFolderCaption();

@@ -4,7 +4,9 @@ interface
 
 uses
   System.Classes, System.SysUtils,
+
   Vcl.Dialogs, Vcl.Forms,
+
   Winapi.Windows;
 
 procedure MessageDialogCentered(msg: String);

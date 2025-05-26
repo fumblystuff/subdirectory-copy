@@ -5,8 +5,6 @@ interface
 uses
   globals, utils,
 
-  CodesiteLogging,
-
   JvExStdCtrls, JvCombobox, JvDriveCtrls,
 
   RzPanel, RzDlgBtn, RzLabel, RzCmboBx,
@@ -28,13 +26,11 @@ type
     labelExistingFiles: TLabel;
     comboOptions: TRzComboBox;
     checkCloseTeraCopy: TCheckBox;
-    DriveTimer: TTimer;
     procedure FormActivate(Sender: TObject);
     procedure CopyDialogButtonsClickOk(Sender: TObject);
     procedure DriveTimerTimer(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure TargetDriveChange(Sender: TObject);
     procedure SetDriveState;
+    procedure TargetDriveDriveChange(Sender: TObject);
   private
     { Private declarations }
   public
@@ -50,9 +46,10 @@ implementation
 
 procedure TfrmStart.CopyDialogButtonsClickOk(Sender: TObject);
 begin
-  if TargetDrive.Drive <> '' then
+  if TargetDrive.Drive <> '' then begin
     SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyTargetDrive,
       TargetDrive.Drive);
+  end;
   SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyOperation,
     selectOperation.value);
   SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProcessing,
@@ -63,17 +60,17 @@ end;
 
 procedure TfrmStart.DriveTimerTimer(Sender: TObject);
 begin
-  Codesite.send(TargetDrive.Drive);
   SetDriveState();
 end;
 
 procedure TfrmStart.SetDriveState;
 begin
-  CopyDialogButtons.EnableOk := (TargetDrive.items.Count > 0);
+   CopyDialogButtons.EnableOk := (TargetDrive.items.Count > 0);
 end;
 
-procedure TfrmStart.TargetDriveChange(Sender: TObject);
+procedure TfrmStart.TargetDriveDriveChange(Sender: TObject);
 begin
+  TargetDrive.Refresh();
   SetDriveState();
 end;
 
@@ -88,8 +85,6 @@ begin
   if TargetDrive.items.Count < 1 then begin
     CopyDialogButtons.EnableOk := false;
     MessageDialogCentered('Unable to copy, no external drives available');
-    DriveTimer.Enabled := true; // keep checking for drives
-    // nothing else to do here
     Exit;
   end;
 
@@ -102,11 +97,6 @@ begin
       TargetDrive.Drive := tmpChar;
     end;
   end;
-end;
-
-procedure TfrmStart.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  DriveTimer.Enabled := false;
 end;
 
 end.
