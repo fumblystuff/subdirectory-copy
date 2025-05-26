@@ -5,6 +5,8 @@ interface
 uses
   globals, utils,
 
+  CodesiteLogging,
+
   JvExStdCtrls, JvCombobox, JvDriveCtrls,
 
   RzPanel, RzDlgBtn, RzLabel, RzCmboBx,
@@ -31,6 +33,8 @@ type
     procedure CopyDialogButtonsClickOk(Sender: TObject);
     procedure DriveTimerTimer(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure TargetDriveChange(Sender: TObject);
+    procedure SetDriveState;
   private
     { Private declarations }
   public
@@ -46,19 +50,31 @@ implementation
 
 procedure TfrmStart.CopyDialogButtonsClickOk(Sender: TObject);
 begin
-  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyTargetDrive,
-    TargetDrive.Drive);
+  if TargetDrive.Drive <> '' then
+    SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyTargetDrive,
+      TargetDrive.Drive);
   SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyOperation,
     selectOperation.value);
   SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProcessing,
-    comboOptions.Value);
+    comboOptions.value);
   SaveRegistryBool(HKEY_CURRENT_USER, AppRegistryKey, keyCloseTeraCopy,
     checkCloseTeraCopy.Checked);
 end;
 
 procedure TfrmStart.DriveTimerTimer(Sender: TObject);
 begin
+  Codesite.send(TargetDrive.Drive);
+  SetDriveState();
+end;
+
+procedure TfrmStart.SetDriveState;
+begin
   CopyDialogButtons.EnableOk := (TargetDrive.items.Count > 0);
+end;
+
+procedure TfrmStart.TargetDriveChange(Sender: TObject);
+begin
+  SetDriveState();
 end;
 
 procedure TfrmStart.FormActivate(Sender: TObject);

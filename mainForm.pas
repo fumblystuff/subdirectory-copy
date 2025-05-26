@@ -278,6 +278,8 @@ begin
   exePath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
     keyExecutable);
 
+  setButtonState();
+
   // should we open the settings dialog?
   // do we have an exePath value?
   openSettings := not Length(exePath) > 0;

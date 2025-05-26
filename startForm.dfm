@@ -75,6 +75,7 @@ object frmStart: TfrmStart
     Offset = 4
     ItemHeight = 20
     TabOrder = 1
+    OnChange = TargetDriveChange
   end
   object selectOperation: TRzComboBox
     Left = 140
@@ -127,7 +128,7 @@ object frmStart: TfrmStart
   object DriveTimer: TTimer
     Enabled = False
     OnTimer = DriveTimerTimer
-    Left = 16
-    Top = 32
+    Left = 64
+    Top = 96
   end
 end
