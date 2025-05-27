@@ -275,13 +275,13 @@ object frmMain: TfrmMain
     end
   end
   object ImageList: TImageList
-    Left = 440
-    Top = 224
+    Left = 448
+    Top = 216
   end
   object RzLauncherMain: TRzLauncher
     Action = 'Open'
     Timeout = -1
-    Left = 232
+    Left = 200
     Top = 280
   end
 end
