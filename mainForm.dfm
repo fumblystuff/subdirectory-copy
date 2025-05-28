@@ -19,33 +19,40 @@ object frmMain: TfrmMain
   TextHeight = 15
   object StatusBar: TRzStatusBar
     Left = 0
-    Top = 422
+    Top = 419
     Width = 624
-    Height = 19
+    Height = 22
+    AutoScalePanes = True
     BorderInner = fsNone
     BorderOuter = fsNone
     BorderSides = [sdLeft, sdTop, sdRight, sdBottom]
     BorderWidth = 0
     StyleElements = [seFont, seClient]
     TabOrder = 0
-    ExplicitTop = 414
-    ExplicitWidth = 622
     object RzStatusPaneCopyright: TRzStatusPane
       Left = 0
       Top = 0
       Width = 521
-      Height = 19
+      Height = 22
       BorderWidth = 0
       Align = alClient
-      Caption = 'Copyright 2025, Fumbly Diddle Software'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clDefault
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      OnClick = RzStatusPaneCopyrightClick
+      Caption = 'Copyright 2025 Fumbly Diddle Software'
       ExplicitLeft = 176
       ExplicitWidth = 448
+      ExplicitHeight = 19
     end
     object RzStatusPaneVersion: TRzVersionInfoStatus
       Left = 521
       Top = 0
       Width = 83
-      Height = 19
+      Height = 22
       BorderWidth = 0
       Align = alRight
       FieldLabel = 'V'
@@ -54,16 +61,18 @@ object frmMain: TfrmMain
       Field = vifFileVersion
       VersionInfo = RzVersionInfo
       ExplicitLeft = 504
+      ExplicitHeight = 19
     end
     object RzStatusPaneSpacer: TRzStatusPane
       Left = 604
       Top = 0
       Width = 20
-      Height = 19
+      Height = 22
       BorderWidth = 0
       Align = alRight
       Caption = ''
       ExplicitLeft = 524
+      ExplicitHeight = 19
     end
   end
   object RzPanel2: TRzPanel
@@ -92,7 +101,7 @@ object frmMain: TfrmMain
     object editRootDirectory: TRzButtonEdit
       Left = 95
       Top = 10
-      Width = 515
+      Width = 513
       Height = 23
       Text = ''
       Anchors = [akLeft, akTop, akRight]
@@ -101,7 +110,7 @@ object frmMain: TfrmMain
       AltBtnNumGlyphs = 1
       ButtonNumGlyphs = 1
       OnButtonClick = editRootDirectoryButtonClick
-      ExplicitWidth = 513
+      ExplicitWidth = 511
     end
   end
   object RzToolbar: TRzToolbar
@@ -185,7 +194,7 @@ object frmMain: TfrmMain
     Left = 0
     Top = 65
     Width = 624
-    Height = 357
+    Height = 354
     Align = alClient
     BorderOuter = fsNone
     TabOrder = 3
@@ -193,7 +202,7 @@ object frmMain: TfrmMain
     ExplicitHeight = 349
     DesignSize = (
       624
-      357)
+      354)
     object labelSourceDirectories: TLabel
       Left = 10
       Top = 10
@@ -204,8 +213,8 @@ object frmMain: TfrmMain
     object listSourceDirectories: TRzListBox
       Left = 13
       Top = 31
-      Width = 518
-      Height = 320
+      Width = 516
+      Height = 317
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = 2
       HorzScrollBar = True
@@ -213,38 +222,39 @@ object frmMain: TfrmMain
       Sorted = True
       TabOrder = 0
       OnClick = ActionSourceItemSelectionChangeExecute
+      OnDblClick = btnRemoveSourceDirectoryClick
       OnEnter = ActionSourceItemSelectionChangeExecute
       OnExit = ActionSourceItemSelectionChangeExecute
-      ExplicitWidth = 516
+      ExplicitWidth = 514
       ExplicitHeight = 312
     end
     object btnAddSourceDirectory: TRzButton
-      Left = 537
+      Left = 535
       Top = 31
       Anchors = [akTop, akRight]
       Caption = 'Add'
       TabOrder = 1
       OnClick = btnAddSourceDirectoryClick
-      ExplicitLeft = 535
+      ExplicitLeft = 533
     end
     object btnRemoveSourceDirectory: TRzButton
-      Left = 537
+      Left = 535
       Top = 70
       Anchors = [akTop, akRight]
       Caption = 'Remove'
       Enabled = False
       TabOrder = 2
       OnClick = btnRemoveSourceDirectoryClick
-      ExplicitLeft = 535
+      ExplicitLeft = 533
     end
     object btnClearSourceDirectories: TRzButton
-      Left = 537
+      Left = 535
       Top = 110
       Anchors = [akTop, akRight]
       Caption = 'Clear'
       TabOrder = 3
       OnClick = btnClearSourceDirectoriesClick
-      ExplicitLeft = 535
+      ExplicitLeft = 533
     end
   end
   object RzFormState: TRzFormState

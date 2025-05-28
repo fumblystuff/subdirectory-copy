@@ -93,7 +93,7 @@ object frmStart: TfrmStart
       'Move'
       'Test')
   end
-  object comboOptions: TRzComboBox
+  object selectProcessing: TRzComboBox
     Left = 140
     Top = 90
     Width = 225

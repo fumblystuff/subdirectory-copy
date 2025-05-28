@@ -5,13 +5,11 @@ interface
 uses
   globals, utils,
 
-  CodeSiteLogging,
-
   jclSysInfo,
 
   RzPanel, RzDlgBtn, RzEdit, RzBtnEdt, RzLabel,
 
-  System.SysUtils, System.Variants, System.Classes,
+  System.SysUtils, System.Variants, System.Classes, System.IOUtils,
 
   Winapi.Windows, Winapi.Messages,
 
@@ -49,9 +47,27 @@ begin
 end;
 
 procedure TfrmSettings.FormActivate(Sender: TObject);
+var
+  exePath: string;
 begin
-  editExecutable.text := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-    keyExecutable);
+  // read the exe path from the registry
+  exePath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
+    keyExecutable, '');
+  // do we have a value?
+  if Length(exePath) > 0 then begin
+    // does the path point to a file?
+    if TPath.HasValidPathChars(exePath, false) and fileExists(exePath) then
+    begin
+      editExecutable.text := exePath;
+    end;
+  end else begin
+    // see if we can use the default value
+    if fileExists(globals.TeraCopyDefaultPath) then begin
+      editExecutable.text := globals.TeraCopyDefaultPath;
+      SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyExecutable,
+        globals.TeraCopyDefaultPath);
+    end;
+  end;
 end;
 
 procedure TfrmSettings.FormCreate(Sender: TObject);

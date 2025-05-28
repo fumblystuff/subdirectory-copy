@@ -49,8 +49,8 @@ procedure TfrmProcessing.FormActivate(Sender: TObject);
 var
   listFile: TextFile;
   closeCmd, doCopy: boolean;
-  copiedFiles, rootIdx, sourceIdx, skippedFiles: integer;
-  closeStr, driveStr, listFilePath, optionStr, operationOption,
+  copiedFiles, sourceIdx, skippedFiles: integer;
+  closeStr, driveStr, listFilePath,  operationOption,
     processingOption, rootPath, executablePath, tmpPath, tmpStr: string;
   sourceFolderList: TStringList;
 begin
@@ -72,20 +72,21 @@ begin
     if not TPath.DriveExists(driveStr) then begin
       ErrorOutput('Target drive does not exist');
       doCopy := false;
+    end else begin
+      memoOutput.lines.Append(Format('Target Drive: %s', [driveStr]));
     end;
   end;
 
   // TeraCopy executable
   executablePath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-    keyExecutable, '');
-  if Length(executablePath) < 1 then begin
-    ErrorOutput('Missing TeraCopy executable path (configured in Settings)');
-    doCopy := false;
-  end;
+    keyExecutable, globals.TeraCopyDefaultPath);
   // does the executable exist?
   if not FileExists(executablePath) then begin
-    ErrorOutput('Teracopy executable does not exist');
+    ErrorOutput('TeraCpy executable does not exist');
     doCopy := false;
+  end else begin
+    memoOutput.lines.Append(Format('TeraCopy Executable: %s',
+      [executablePath]));
   end;
 
   // Root Directory
@@ -145,9 +146,9 @@ begin
 
     if copiedFiles > 0 then begin
       operationOption := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-        keyOperation, 'Copy');
+        keyOperationStr, 'Copy');
       processingOption := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-        keyProcessing, '/OverwriteOlder');
+        keyProcessingStr, '/OverwriteOlder');
       closeCmd := ReadRegistryBool(HKEY_CURRENT_USER, AppRegistryKey,
         keyCloseTeraCopy, false);
 

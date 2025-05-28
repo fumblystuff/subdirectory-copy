@@ -24,7 +24,7 @@ type
     selectOperation: TRzComboBox;
     labelOperation: TLabel;
     labelExistingFiles: TLabel;
-    comboOptions: TRzComboBox;
+    selectProcessing: TRzComboBox;
     checkCloseTeraCopy: TCheckBox;
     procedure FormActivate(Sender: TObject);
     procedure CopyDialogButtonsClickOk(Sender: TObject);
@@ -50,10 +50,17 @@ begin
     SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyTargetDrive,
       TargetDrive.Drive);
   end;
-  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyOperation,
+  // Operation value (command) and Idx
+  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyOperationStr,
     selectOperation.value);
-  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProcessing,
-    comboOptions.value);
+  SaveRegistryInteger(HKEY_CURRENT_USER, AppRegistryKey, keyOperationIdx,
+    selectOperation.ItemIndex);
+  // Processing value (command) and Idx
+  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProcessingStr,
+    selectProcessing.value);
+  SaveRegistryInteger(HKEY_CURRENT_USER, AppRegistryKey, keyProcessingIdx,
+    selectProcessing.ItemIndex);
+  // TeraCopy close
   SaveRegistryBool(HKEY_CURRENT_USER, AppRegistryKey, keyCloseTeraCopy,
     checkCloseTeraCopy.Checked);
 end;
@@ -65,7 +72,7 @@ end;
 
 procedure TfrmStart.SetDriveState;
 begin
-   CopyDialogButtons.EnableOk := (TargetDrive.items.Count > 0);
+  CopyDialogButtons.EnableOk := (TargetDrive.items.Count > 0);
 end;
 
 procedure TfrmStart.TargetDriveDriveChange(Sender: TObject);
@@ -77,10 +84,25 @@ end;
 procedure TfrmStart.FormActivate(Sender: TObject);
 var
   tmpChar: Char;
+  tmpInt: Integer;
   tmpStr: String;
 begin
   checkCloseTeraCopy.Checked := ReadRegistryBool(HKEY_CURRENT_USER,
     AppRegistryKey, keyCloseTeraCopy, checkCloseTeraCopy.Checked);
+
+  // Set the selected Operation
+  tmpInt := ReadRegistryInteger(HKEY_CURRENT_USER, AppRegistryKey,
+    keyOperationIdx, -1);
+  if tmpInt > -1 then begin
+    selectOperation.ItemIndex := tmpInt;
+  end;
+
+  // Set the selected Processing option
+  tmpInt := ReadRegistryInteger(HKEY_CURRENT_USER, AppRegistryKey,
+    keyProcessingIdx, -1);
+  if tmpInt > -1 then begin
+    selectProcessing.ItemIndex := tmpInt;
+  end;
 
   if TargetDrive.items.Count < 1 then begin
     CopyDialogButtons.EnableOk := false;

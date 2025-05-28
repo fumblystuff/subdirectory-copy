@@ -69,6 +69,7 @@ type
     procedure btnHelpClick(Sender: TObject);
     procedure editRootDirectoryChange(Sender: TObject);
     procedure setButtonState;
+    procedure RzStatusPaneCopyrightClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -114,9 +115,13 @@ begin
   theStrings.Free;
 end;
 
+procedure TfrmMain.RzStatusPaneCopyrightClick(Sender: TObject);
+begin
+  RzLauncherMain.FileName := FumblyURL;
+  RzLauncherMain.Launch;
+end;
+
 procedure TfrmMain.SaveConfiguration;
-var
-  selectedDrive: string;
 begin
   SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyRootDirectory,
     editRootDirectory.text);
@@ -219,7 +224,7 @@ end;
 procedure TfrmMain.btnHelpClick(Sender: TObject);
 begin
   // launch the docs in the default browser
-  RzLauncherMain.FileName := 'https://docs.fumblydiddle.com/subcopy';
+  RzLauncherMain.FileName := DocsURL;
   RzLauncherMain.Launch;
 end;
 
@@ -268,33 +273,44 @@ begin
   DragAcceptFiles(Handle, true);
 end;
 
-procedure TfrmMain.FormResize(Sender: TObject);
-begin
-  // Adjust the number of source folder columns based on the
-  // width of the listbox
-  listSourceDirectories.Columns := listSourceDirectories.Width div 250;
-end;
-
 procedure TfrmMain.FormActivate(Sender: TObject);
 var
   openSettings: Boolean;
   exePath: String;
 begin
-  openSettings := false;
-  exePath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-    keyExecutable);
-
   setButtonState();
 
   // should we open the settings dialog?
+  openSettings := false;
+  exePath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
+    keyExecutable, '');
+  // do we have an executable path?
+  if Length(exePath) < 1 then begin
+    // No? Can we use the default?
+    if FileExists(globals.TeraCopyDefaultPath) then begin
+      // Yes!
+      exePath := globals.TeraCopyDefaultPath;
+      SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
+        keyExecutable, exePath);
+      Exit;
+    end;
+  end;
   // do we have an exePath value?
   openSettings := not Length(exePath) > 0;
   // is it a valid file path?
   openSettings := openSettings or not TPath.HasValidPathChars(exePath, false);
   // does the file exist?
-  openSettings := openSettings or not fileExists(exePath, false);
-  if openSettings then
+  openSettings := openSettings or not FileExists(exePath, false);
+  if openSettings then begin
     btnSettingsClick(Sender);
+  end;
+end;
+
+procedure TfrmMain.FormResize(Sender: TObject);
+begin
+  // Adjust the number of source folder columns based on the
+  // width of the listbox
+  listSourceDirectories.Columns := listSourceDirectories.Width div 250;
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
