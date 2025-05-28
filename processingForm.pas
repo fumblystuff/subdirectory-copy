@@ -119,7 +119,7 @@ begin
   if doCopy then begin
     // create the list file
     listFilePath := TPath.GetTempFileName();
-    memoOutput.lines.Append(Format('Creating temporary file (%s)',
+    memoOutput.lines.Append(Format('Creating temporary file: %s',
       [listFilePath]));
     AssignFile(listFile, listFilePath);
     ReWrite(listFile);

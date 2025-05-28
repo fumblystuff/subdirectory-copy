@@ -23,6 +23,8 @@ object frmProcessing: TfrmProcessing
     Height = 405
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 622
+    ExplicitHeight = 397
   end
   object ProcessingDialogButtons: TRzDialogButtons
     Left = 0
@@ -35,6 +37,8 @@ object frmProcessing: TfrmProcessing
     ShowOKButton = False
     Color = 15987699
     TabOrder = 1
+    ExplicitTop = 397
+    ExplicitWidth = 622
   end
   object RzLauncher: TRzLauncher
     Action = 'Open'
