@@ -159,6 +159,10 @@
             <Form>frmProcessing</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="aboutForm.pas">
+            <Form>frmAbout</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

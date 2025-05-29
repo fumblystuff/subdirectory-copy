@@ -12,7 +12,7 @@ object frmMain: TfrmMain
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Menu = MainMenu1
+  Menu = MainMenu
   OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
@@ -77,7 +77,7 @@ object frmMain: TfrmMain
   end
   object RzPanel2: TRzPanel
     Left = 0
-    Top = 29
+    Top = 0
     Width = 624
     Height = 36
     Align = alTop
@@ -87,6 +87,7 @@ object frmMain: TfrmMain
     Padding.Right = 10
     Padding.Bottom = 10
     TabOrder = 1
+    ExplicitTop = 29
     ExplicitWidth = 622
     DesignSize = (
       624
@@ -113,96 +114,20 @@ object frmMain: TfrmMain
       ExplicitWidth = 511
     end
   end
-  object RzToolbar: TRzToolbar
-    Left = 0
-    Top = 0
-    Width = 624
-    Height = 29
-    Images = ImageList
-    BorderInner = fsNone
-    BorderOuter = fsGroove
-    BorderSides = [sdTop]
-    BorderWidth = 0
-    Caption = 'Help'
-    TabOrder = 2
-    ExplicitWidth = 622
-    ToolbarControls = (
-      btnStart
-      RzSpacer1
-      btnSettings
-      RzSpacer2
-      btnHelp
-      RzSpacer3
-      btnClose)
-    object btnStart: TRzToolButton
-      Left = 4
-      Top = 2
-      Width = 50
-      Images = ImageList
-      ShowCaption = True
-      UseToolbarButtonSize = False
-      UseToolbarShowCaption = False
-      Caption = '&Start'
-      OnClick = btnStartClick
-    end
-    object RzSpacer1: TRzSpacer
-      Left = 54
-      Top = 2
-    end
-    object btnSettings: TRzToolButton
-      Left = 62
-      Top = 2
-      Width = 50
-      ShowCaption = True
-      UseToolbarButtonSize = False
-      UseToolbarShowCaption = False
-      Caption = 'Se&ttings'
-      ParentShowHint = False
-      ShowHint = False
-      OnClick = btnSettingsClick
-    end
-    object RzSpacer2: TRzSpacer
-      Left = 112
-      Top = 2
-    end
-    object btnClose: TRzToolButton
-      Left = 165
-      Top = 2
-      Width = 50
-      Images = ImageList
-      ShowCaption = True
-      UseToolbarButtonSize = False
-      UseToolbarShowCaption = False
-      Caption = '&Close'
-      OnClick = btnCloseClick
-    end
-    object RzSpacer3: TRzSpacer
-      Left = 157
-      Top = 2
-    end
-    object btnHelp: TRzToolButton
-      Left = 120
-      Top = 2
-      Width = 37
-      ShowCaption = True
-      UseToolbarShowCaption = False
-      Caption = 'Help'
-      OnClick = btnHelpClick
-    end
-  end
   object RzPanel3: TRzPanel
     Left = 0
-    Top = 65
+    Top = 36
     Width = 624
-    Height = 354
+    Height = 347
     Align = alClient
     BorderOuter = fsNone
-    TabOrder = 3
+    TabOrder = 2
+    ExplicitTop = 65
     ExplicitWidth = 622
-    ExplicitHeight = 304
+    ExplicitHeight = 346
     DesignSize = (
       624
-      354)
+      347)
     object labelSourceDirectories: TLabel
       Left = 10
       Top = 10
@@ -214,7 +139,7 @@ object frmMain: TfrmMain
       Left = 13
       Top = 31
       Width = 516
-      Height = 317
+      Height = 310
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = 2
       HorzScrollBar = True
@@ -257,6 +182,21 @@ object frmMain: TfrmMain
       ExplicitLeft = 533
     end
   end
+  object RzDialogButtonsMain: TRzDialogButtons
+    Left = 0
+    Top = 383
+    Width = 624
+    CaptionOk = 'Start Copy'
+    CaptionCancel = 'Close'
+    EnableOk = False
+    WidthOk = 100
+    OnClickOk = RzDialogButtonsMainClickOk
+    OnClickCancel = RzDialogButtonsMainClickCancel
+    TabOrder = 3
+    ExplicitLeft = 232
+    ExplicitTop = 232
+    ExplicitWidth = 185
+  end
   object RzFormState: TRzFormState
     RegIniFile = RzRegIniFile
     Left = 264
@@ -294,45 +234,49 @@ object frmMain: TfrmMain
     Left = 200
     Top = 280
   end
-  object MainMenu1: TMainMenu
+  object MainMenu: TMainMenu
     Left = 312
     Top = 280
-    object File1: TMenuItem
+    object menuFile: TMenuItem
       Caption = '&File'
-      object File2: TMenuItem
+      object menuNew: TMenuItem
         Caption = '&New'
         ShortCut = 16462
       end
-      object Open1: TMenuItem
+      object menuOpen: TMenuItem
         Caption = '&Open'
         ShortCut = 16463
       end
-      object Save1: TMenuItem
+      object menuSave: TMenuItem
         Caption = '&Save'
         ShortCut = 16467
       end
       object N1: TMenuItem
         Caption = '-'
       end
-      object Settings1: TMenuItem
+      object menuSettings: TMenuItem
         Caption = 'Se&ttings'
+        OnClick = menuSettingsClick
       end
       object Open2: TMenuItem
         Caption = '-'
       end
-      object Exit1: TMenuItem
+      object menuExit: TMenuItem
         Caption = 'E&xit'
         ShortCut = 16499
+        OnClick = btnCloseClick
       end
     end
-    object Help1: TMenuItem
+    object menuHelp: TMenuItem
       Caption = '&Help'
-      object Help2: TMenuItem
+      object menuAbout: TMenuItem
         Caption = '&About'
+        OnClick = menuAboutClick
       end
-      object Documentation1: TMenuItem
+      object menuDocumentation: TMenuItem
         Caption = '&Documentation'
         ShortCut = 112
+        OnClick = menuDocumentationClick
       end
     end
   end

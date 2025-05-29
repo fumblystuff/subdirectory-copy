@@ -3,7 +3,7 @@ unit mainForm;
 interface
 
 uses
-  startForm, globals, processingForm, settingsForm, utils,
+  aboutForm, globals, processingForm, settingsForm, startForm, utils,
 
   JvExStdCtrls, JvCombobox, JvDriveCtrls, jclSysInfo,
 
@@ -18,7 +18,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Mask,
   Vcl.ActnList, Vcl.Graphics, Vcl.ImgList, Vcl.FileCtrl,
 
-  Winapi.Windows, Winapi.Messages, Vcl.Menus;
+  Winapi.Windows, Winapi.Messages, Vcl.Menus, JvBaseDlg, JvWinDialogs;
 
 type
   TfrmMain = class(TForm)
@@ -31,13 +31,7 @@ type
     RzSelectFolderDialog: TRzSelectFolderDialog;
     ActionList: TActionList;
     ActionSourceItemSelectionChange: TAction;
-    RzToolbar: TRzToolbar;
-    btnStart: TRzToolButton;
     ImageList: TImageList;
-    RzSpacer1: TRzSpacer;
-    btnSettings: TRzToolButton;
-    RzSpacer2: TRzSpacer;
-    btnClose: TRzToolButton;
     RzPanel3: TRzPanel;
     labelSourceDirectories: TLabel;
     listSourceDirectories: TRzListBox;
@@ -48,21 +42,20 @@ type
     RzStatusPaneVersion: TRzVersionInfoStatus;
     RzStatusPaneSpacer: TRzStatusPane;
     editRootDirectory: TRzButtonEdit;
-    RzSpacer3: TRzSpacer;
-    btnHelp: TRzToolButton;
     RzLauncherMain: TRzLauncher;
-    MainMenu1: TMainMenu;
-    File1: TMenuItem;
-    File2: TMenuItem;
-    Open1: TMenuItem;
+    MainMenu: TMainMenu;
+    menuFile: TMenuItem;
+    menuNew: TMenuItem;
+    menuOpen: TMenuItem;
     Open2: TMenuItem;
-    Exit1: TMenuItem;
-    Settings1: TMenuItem;
-    Save1: TMenuItem;
+    menuExit: TMenuItem;
+    menuSettings: TMenuItem;
+    menuSave: TMenuItem;
     N1: TMenuItem;
-    Help1: TMenuItem;
-    Help2: TMenuItem;
-    Documentation1: TMenuItem;
+    menuHelp: TMenuItem;
+    menuAbout: TMenuItem;
+    menuDocumentation: TMenuItem;
+    RzDialogButtonsMain: TRzDialogButtons;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -78,10 +71,14 @@ type
     procedure btnSettingsClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
     procedure editRootDirectoryButtonClick(Sender: TObject);
-    procedure btnHelpClick(Sender: TObject);
     procedure editRootDirectoryChange(Sender: TObject);
     procedure setButtonState;
     procedure RzStatusPaneCopyrightClick(Sender: TObject);
+    procedure menuSettingsClick(Sender: TObject);
+    procedure menuDocumentationClick(Sender: TObject);
+    procedure RzDialogButtonsMainClickCancel(Sender: TObject);
+    procedure RzDialogButtonsMainClickOk(Sender: TObject);
+    procedure menuAboutClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -127,6 +124,29 @@ begin
   theStrings.Free;
 end;
 
+procedure TfrmMain.RzDialogButtonsMainClickCancel(Sender: TObject);
+begin
+  SaveConfiguration();
+  RzFormState.SaveState;
+  Application.Terminate;
+end;
+
+procedure TfrmMain.RzDialogButtonsMainClickOk(Sender: TObject);
+var
+  startForm: TfrmStart;
+  processingForm: TfrmProcessing;
+begin
+  SaveConfiguration();
+  startForm := TfrmStart.Create(nil);
+  startForm.ShowModal;
+  if startForm.ModalResult = mrOk then begin
+    processingForm := TfrmProcessing.Create(nil);
+    processingForm.ShowModal;
+    processingForm.Free;
+  end;
+  startForm.Free;
+end;
+
 procedure TfrmMain.RzStatusPaneCopyrightClick(Sender: TObject);
 begin
   RzLauncherMain.FileName := FumblyURL;
@@ -144,8 +164,17 @@ end;
 procedure TfrmMain.setButtonState;
 begin
   btnAddSourceDirectory.Enabled := Length(editRootDirectory.text) > 0;
-  btnStart.Enabled := (Length(editRootDirectory.text) > 0) and
+  RzDialogButtonsMain.EnableOk := (Length(editRootDirectory.text) > 0) and
     (listSourceDirectories.items.count > 0);
+end;
+
+procedure TfrmMain.menuSettingsClick(Sender: TObject);
+var
+  settingsForm: TfrmSettings;
+begin
+  settingsForm := TfrmSettings.Create(nil);
+  settingsForm.ShowModal;
+  settingsForm.Free;
 end;
 
 procedure TfrmMain.UpdateSourceFolderCaption;
@@ -205,6 +234,22 @@ begin
   startForm.Free;
 end;
 
+procedure TfrmMain.menuAboutClick(Sender: TObject);
+var
+  aboutForm: TfrmAbout;
+begin
+  aboutForm := TfrmAbout.Create(nil);
+  aboutForm.ShowModal;
+  aboutForm.Free;
+end;
+
+procedure TfrmMain.menuDocumentationClick(Sender: TObject);
+begin
+  // launch the docs in the default browser
+  RzLauncherMain.FileName := DocsURL;
+  RzLauncherMain.Launch;
+end;
+
 procedure TfrmMain.editRootDirectoryButtonClick(Sender: TObject);
 begin
   if RzSelectFolderDialog.Execute then begin
@@ -231,13 +276,6 @@ begin
   SaveConfiguration();
   RzFormState.SaveState;
   Application.Terminate;
-end;
-
-procedure TfrmMain.btnHelpClick(Sender: TObject);
-begin
-  // launch the docs in the default browser
-  RzLauncherMain.FileName := DocsURL;
-  RzLauncherMain.Launch;
 end;
 
 procedure TfrmMain.WMDropFiles(var Msg: TWMDropFiles);

@@ -7,7 +7,8 @@ uses
   settingsForm in 'settingsForm.pas' {frmSettings},
   startForm in 'startForm.pas' {frmStart},
   globals in 'globals.pas',
-  processingForm in 'processingForm.pas' {frmProcessing};
+  processingForm in 'processingForm.pas' {frmProcessing},
+  aboutForm in 'aboutForm.pas' {frmAbout};
 
 {$R *.res}
 
@@ -18,5 +19,6 @@ begin
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmStart, frmStart);
   Application.CreateForm(TfrmProcessing, frmProcessing);
+  Application.CreateForm(TfrmAbout, frmAbout);
   Application.Run;
 end.
