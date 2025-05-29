@@ -18,7 +18,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Mask,
   Vcl.ActnList, Vcl.Graphics, Vcl.ImgList, Vcl.FileCtrl,
 
-  Winapi.Windows, Winapi.Messages;
+  Winapi.Windows, Winapi.Messages, Vcl.Menus;
 
 type
   TfrmMain = class(TForm)
@@ -51,6 +51,18 @@ type
     RzSpacer3: TRzSpacer;
     btnHelp: TRzToolButton;
     RzLauncherMain: TRzLauncher;
+    MainMenu1: TMainMenu;
+    File1: TMenuItem;
+    File2: TMenuItem;
+    Open1: TMenuItem;
+    Open2: TMenuItem;
+    Exit1: TMenuItem;
+    Settings1: TMenuItem;
+    Save1: TMenuItem;
+    N1: TMenuItem;
+    Help1: TMenuItem;
+    Help2: TMenuItem;
+    Documentation1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

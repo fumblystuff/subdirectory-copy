@@ -12,6 +12,7 @@ object frmMain: TfrmMain
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Menu = MainMenu1
   OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
@@ -29,10 +30,12 @@ object frmMain: TfrmMain
     BorderWidth = 0
     StyleElements = [seFont, seClient]
     TabOrder = 0
+    ExplicitTop = 411
+    ExplicitWidth = 622
     object RzStatusPaneCopyright: TRzStatusPane
       Left = 0
       Top = 0
-      Width = 521
+      Width = 522
       Height = 22
       BorderWidth = 0
       Align = alClient
@@ -44,14 +47,12 @@ object frmMain: TfrmMain
       ParentFont = False
       OnClick = RzStatusPaneCopyrightClick
       Caption = 'Copyright 2025 Fumbly Diddle Software'
-      ExplicitLeft = 176
-      ExplicitWidth = 448
-      ExplicitHeight = 19
+      ExplicitWidth = 524
     end
     object RzStatusPaneVersion: TRzVersionInfoStatus
-      Left = 521
+      Left = 522
       Top = 0
-      Width = 83
+      Width = 82
       Height = 22
       BorderWidth = 0
       Align = alRight
@@ -60,8 +61,7 @@ object frmMain: TfrmMain
       AutoSize = True
       Field = vifFileVersion
       VersionInfo = RzVersionInfo
-      ExplicitLeft = 504
-      ExplicitHeight = 19
+      ExplicitLeft = 519
     end
     object RzStatusPaneSpacer: TRzStatusPane
       Left = 604
@@ -199,7 +199,7 @@ object frmMain: TfrmMain
     BorderOuter = fsNone
     TabOrder = 3
     ExplicitWidth = 622
-    ExplicitHeight = 349
+    ExplicitHeight = 304
     DesignSize = (
       624
       354)
@@ -226,7 +226,7 @@ object frmMain: TfrmMain
       OnEnter = ActionSourceItemSelectionChangeExecute
       OnExit = ActionSourceItemSelectionChangeExecute
       ExplicitWidth = 514
-      ExplicitHeight = 312
+      ExplicitHeight = 309
     end
     object btnAddSourceDirectory: TRzButton
       Left = 535
@@ -293,5 +293,47 @@ object frmMain: TfrmMain
     Timeout = -1
     Left = 200
     Top = 280
+  end
+  object MainMenu1: TMainMenu
+    Left = 312
+    Top = 280
+    object File1: TMenuItem
+      Caption = '&File'
+      object File2: TMenuItem
+        Caption = '&New'
+        ShortCut = 16462
+      end
+      object Open1: TMenuItem
+        Caption = '&Open'
+        ShortCut = 16463
+      end
+      object Save1: TMenuItem
+        Caption = '&Save'
+        ShortCut = 16467
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object Settings1: TMenuItem
+        Caption = 'Se&ttings'
+      end
+      object Open2: TMenuItem
+        Caption = '-'
+      end
+      object Exit1: TMenuItem
+        Caption = 'E&xit'
+        ShortCut = 16499
+      end
+    end
+    object Help1: TMenuItem
+      Caption = '&Help'
+      object Help2: TMenuItem
+        Caption = '&About'
+      end
+      object Documentation1: TMenuItem
+        Caption = '&Documentation'
+        ShortCut = 112
+      end
+    end
   end
 end
