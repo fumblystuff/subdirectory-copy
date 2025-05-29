@@ -136,7 +136,7 @@ object frmMain: TfrmMain
       Caption = 'Source Directories'
     end
     object listSourceDirectories: TRzListBox
-      Left = 13
+      Left = 10
       Top = 31
       Width = 516
       Height = 310
@@ -150,8 +150,6 @@ object frmMain: TfrmMain
       OnDblClick = btnRemoveSourceDirectoryClick
       OnEnter = ActionSourceItemSelectionChangeExecute
       OnExit = ActionSourceItemSelectionChangeExecute
-      ExplicitWidth = 514
-      ExplicitHeight = 309
     end
     object btnAddSourceDirectory: TRzButton
       Left = 535
