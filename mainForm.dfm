@@ -75,7 +75,7 @@ object frmMain: TfrmMain
       ExplicitHeight = 19
     end
   end
-  object RzPanel2: TRzPanel
+  object RzPanelRoot: TRzPanel
     Left = 0
     Top = 0
     Width = 624
@@ -114,7 +114,7 @@ object frmMain: TfrmMain
       ExplicitWidth = 511
     end
   end
-  object RzPanel3: TRzPanel
+  object RzPanelSource: TRzPanel
     Left = 0
     Top = 36
     Width = 624

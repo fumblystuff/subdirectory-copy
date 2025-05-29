@@ -26,13 +26,13 @@ type
     RzFormState: TRzFormState;
     RzRegIniFile: TRzRegIniFile;
     RzVersionInfo: TRzVersionInfo;
-    RzPanel2: TRzPanel;
+    RzPanelRoot: TRzPanel;
     labelRootDirectory: TLabel;
     RzSelectFolderDialog: TRzSelectFolderDialog;
     ActionList: TActionList;
     ActionSourceItemSelectionChange: TAction;
     ImageList: TImageList;
-    RzPanel3: TRzPanel;
+    RzPanelSource: TRzPanel;
     labelSourceDirectories: TLabel;
     listSourceDirectories: TRzListBox;
     btnAddSourceDirectory: TRzButton;
