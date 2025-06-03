@@ -121,8 +121,9 @@ end;
 
 procedure TfrmMain.OpenProject;
 var
-  idx: Integer;
+  idx, tmpIdx: Integer;
   strings: TStringList;
+  folderName, tmpStr: String;
 begin
   if FileExists(ProjectPath) then begin
     // write the changes to the file
@@ -135,7 +136,15 @@ begin
     RzIniProject.ReadSectionValues(keySource, strings);
     if strings.Count > 0 then begin
       for idx := 0 to strings.Count - 1 do begin
-        listSourceDirectories.Add(strings[idx]);
+        tmpStr := strings[idx];
+        tmpIdx := tmpStr.IndexOf('=');
+        if tmpIdx > -1 then begin
+          folderName := Copy(tmpStr, tmpIdx + 2, 99);
+          listSourceDirectories.Add(folderName);
+        end else begin
+          MessageDialogCentered(Format('Invalid Source Directory: "%s"',
+            [tmpStr]));
+        end;
       end;
     end;
     ProjectChanged := False;
@@ -153,7 +162,7 @@ begin
       Exit;
     end;
   end;
-  // write the changes to the file
+
   RzIniProject.path := ProjectPath;
   // Root directory
   RzIniProject.WriteString(keyRoot, keyRootDirectory, editRootDirectory.Text);
@@ -307,14 +316,15 @@ end;
 
 procedure TfrmMain.menuOpenClick(Sender: TObject);
 begin
-  Codesite.Send('Open');
-  // open a project file
-
-
-  OpenProject();
-  ProjectChanged := False;
+  if FileOpenDialog.Execute then begin
+    ProjectPath := FileOpenDialog.FileName;
+    SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProjectPath,
+      ProjectPath);
+    OpenProject();
+  end;
 
   // TODO: Update the recent project list
+  Codesite.Send('Update the recent project list');
 end;
 
 procedure TfrmMain.menuAboutClick(Sender: TObject);
@@ -402,6 +412,8 @@ begin
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
+var
+  tmpPath: String;
 begin
   RzVersionInfo.filePath := Application.ExeName;
   RzRegApp.path := AppRegistryKey;
@@ -409,11 +421,18 @@ begin
   ProjectPath := '';
   RzSaveDialog.InitialDir := TPath.GetDocumentsPath();
 
-  // TODO: Populate the Recent Projects submenu
-
-  // TODO: Read the last project path
-  // TODO: Load the last project
+  tmpPath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
+    keyProjectPath, '');
+  if not tmpPath.IsEmpty() then begin
+    if FileExists(tmpPath) then begin
+      ProjectPath := tmpPath;
+      OpenProject();
+    end;
+  end;
   UpdateSourceFolderCaption();
+
+  // TODO: Populate the Recent Projects submenu
+  Codesite.Send('Populate the Recent Projects menu');
 end;
 
 procedure TfrmMain.FormActivate(Sender: TObject);
