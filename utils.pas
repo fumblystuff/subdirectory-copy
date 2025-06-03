@@ -5,11 +5,12 @@ interface
 uses
   System.Classes, System.SysUtils,
 
-  Vcl.Dialogs, Vcl.Forms,
+  Vcl.Controls, Vcl.Dialogs, Vcl.Forms,
 
   Winapi.Windows;
 
 procedure MessageDialogCentered(msg: String);
+function MessageConfirmationCentered(headerText, msg: String): boolean;
 function ReadRegistryBool(rootKey: HKEY; key, valueName: String;
   defaultValue: Boolean = false): Boolean;
 function ReadRegistryString(rootKey: HKEY; key, valueName: String;
@@ -50,6 +51,17 @@ begin
   f.Caption := 'Information';
   f.Position := poOwnerFormCenter;
   f.ShowModal;
+end;
+
+function MessageConfirmationCentered(headerText, msg: String): boolean;
+var
+  f: TForm;
+begin
+  f := CreateMessageDialog(msg, mtConfirmation, [mbYes, mbNo]);
+  f.Caption := headerText;
+  f.Position := poOwnerFormCenter;
+  f.ShowModal;
+  Result := f.ModalResult = mrYes;
 end;
 
 function ReadRegistryBool(rootKey: HKEY; key, valueName: String;

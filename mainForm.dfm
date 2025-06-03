@@ -87,7 +87,6 @@ object frmMain: TfrmMain
     Padding.Right = 10
     Padding.Bottom = 10
     TabOrder = 1
-    ExplicitTop = 29
     ExplicitWidth = 622
     DesignSize = (
       624
@@ -122,9 +121,8 @@ object frmMain: TfrmMain
     Align = alClient
     BorderOuter = fsNone
     TabOrder = 2
-    ExplicitTop = 65
     ExplicitWidth = 622
-    ExplicitHeight = 346
+    ExplicitHeight = 339
     DesignSize = (
       624
       347)
@@ -150,6 +148,8 @@ object frmMain: TfrmMain
       OnDblClick = btnRemoveSourceDirectoryClick
       OnEnter = ActionSourceItemSelectionChangeExecute
       OnExit = ActionSourceItemSelectionChangeExecute
+      ExplicitWidth = 514
+      ExplicitHeight = 302
     end
     object btnAddSourceDirectory: TRzButton
       Left = 535
@@ -191,63 +191,68 @@ object frmMain: TfrmMain
     OnClickOk = RzDialogButtonsMainClickOk
     OnClickCancel = RzDialogButtonsMainClickCancel
     TabOrder = 3
-    ExplicitLeft = 232
-    ExplicitTop = 232
-    ExplicitWidth = 185
+    ExplicitTop = 375
+    ExplicitWidth = 622
   end
   object RzFormState: TRzFormState
-    RegIniFile = RzRegIniFile
-    Left = 264
-    Top = 216
+    RegIniFile = RzRegApp
+    Left = 120
+    Top = 96
   end
-  object RzRegIniFile: TRzRegIniFile
+  object RzRegApp: TRzRegIniFile
     PathType = ptRegistry
-    Left = 176
-    Top = 216
+    Left = 48
+    Top = 96
   end
   object RzVersionInfo: TRzVersionInfo
-    Left = 80
-    Top = 216
+    Left = 200
+    Top = 96
   end
   object RzSelectFolderDialog: TRzSelectFolderDialog
     FormPosition = poMainFormCenter
-    Left = 80
-    Top = 280
+    Left = 72
+    Top = 160
   end
   object ActionList: TActionList
-    Left = 360
-    Top = 216
+    Left = 144
+    Top = 232
     object ActionSourceItemSelectionChange: TAction
       Caption = 'ActionSourceItemSelectionChange'
       OnExecute = ActionSourceItemSelectionChangeExecute
     end
   end
-  object ImageList: TImageList
-    Left = 448
-    Top = 216
-  end
   object RzLauncherMain: TRzLauncher
     Action = 'Open'
     Timeout = -1
-    Left = 200
-    Top = 280
+    Left = 280
+    Top = 160
   end
   object MainMenu: TMainMenu
-    Left = 312
-    Top = 280
+    Left = 72
+    Top = 232
     object menuFile: TMenuItem
       Caption = '&File'
       object menuNew: TMenuItem
         Caption = '&New'
         ShortCut = 16462
+        OnClick = menuNewClick
       end
       object menuOpen: TMenuItem
         Caption = '&Open'
         ShortCut = 16463
+        OnClick = menuOpenClick
+      end
+      object menuReopen: TMenuItem
+        Caption = 'Recent...'
       end
       object menuSave: TMenuItem
         Caption = '&Save'
         ShortCut = 16467
+        OnClick = menuSaveClick
+      end
+      object menuSaveAs: TMenuItem
+        Caption = 'Save As'
+        OnClick = menuSaveAsClick
       end
       object N1: TMenuItem
         Caption = '-'
@@ -277,5 +282,24 @@ object frmMain: TfrmMain
         OnClick = menuDocumentationClick
       end
     end
+  end
+  object RzIniProject: TRzRegIniFile
+    Left = 280
+    Top = 96
+  end
+  object FileOpenDialog: TFileOpenDialog
+    FavoriteLinks = <>
+    FileTypes = <>
+    Options = []
+    Left = 184
+    Top = 160
+  end
+  object RzSaveDialog: TRzSaveDialog
+    DefaultExt = 'scpy'
+    Options = [osoCreatePrompt, osoHideReadOnly, osoOverwritePrompt, osoAllowTree, osoShowHints, osoOleDrag, osoOleDrop, osoShowHidden]
+    Filter = 'SubCopy Project|*.scpy'
+    FormPosition = poOwnerFormCenter
+    Left = 240
+    Top = 232
   end
 end

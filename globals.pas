@@ -16,7 +16,10 @@ const
   keyOperationStr = 'OperationStr';
   keyProcessingIdx = 'ProcessingIdx';
   keyProcessingStr = 'ProcessingStr';
+  keyProjectPath = 'ProjectPath';
+  keyRoot = 'Root';
   keyRootDirectory = 'RootDirectory';
+  keySource = 'Source';
   keySourceDirectories = 'SourceDirectories';
   keyTargetDrive = 'TargetDrive';
 
