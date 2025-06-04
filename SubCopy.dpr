@@ -17,8 +17,5 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := 'SubCopy';
   Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TfrmStart, frmStart);
-  Application.CreateForm(TfrmProcessing, frmProcessing);
-  Application.CreateForm(TfrmAbout, frmAbout);
   Application.Run;
 end.

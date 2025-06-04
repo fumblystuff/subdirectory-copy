@@ -15,7 +15,7 @@ uses
   ShellAPI,
 
   System.SysUtils, System.Variants, System.Classes, System.Actions,
-  System.ImageList, System.IOUtils,
+  System.ImageList, System.IOUtils, System.UITypes,
 
   Vcl.Controls, Vcl.Dialogs, Vcl.Forms, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Mask,
   Vcl.ActnList, Vcl.Graphics, Vcl.ImgList, Vcl.FileCtrl,
@@ -24,44 +24,42 @@ uses
 
 type
   TfrmMain = class(TForm)
-    StatusBar: TRzStatusBar;
-    RzFormState: TRzFormState;
-    RzRegApp: TRzRegIniFile;
-    RzVersionInfo: TRzVersionInfo;
-    RzPanelRoot: TRzPanel;
-    labelRootDirectory: TLabel;
-    RzSelectFolderDialog: TRzSelectFolderDialog;
     ActionList: TActionList;
     ActionSourceItemSelectionChange: TAction;
-    RzPanelSource: TRzPanel;
+    btnAddSourceDirectory: TRzButton;
+    btnClearSourceDirectories: TRzButton;
+    btnRemoveSourceDirectory: TRzButton;
+    editRootDirectory: TRzButtonEdit;
+    FileOpenDialog: TFileOpenDialog;
+    labelRootDirectory: TLabel;
     labelSourceDirectories: TLabel;
     listSourceDirectories: TRzListBox;
-    btnAddSourceDirectory: TRzButton;
-    btnRemoveSourceDirectory: TRzButton;
-    btnClearSourceDirectories: TRzButton;
-    RzStatusPaneCopyright: TRzStatusPane;
-    RzStatusPaneVersion: TRzVersionInfoStatus;
-    RzStatusPaneSpacer: TRzStatusPane;
-    editRootDirectory: TRzButtonEdit;
-    RzLauncherMain: TRzLauncher;
     MainMenu: TMainMenu;
-    menuFile: TMenuItem;
-    menuNew: TMenuItem;
-    menuOpen: TMenuItem;
-    Open2: TMenuItem;
-    menuExit: TMenuItem;
-    menuSettings: TMenuItem;
-    menuSave: TMenuItem;
-    N1: TMenuItem;
-    menuHelp: TMenuItem;
     menuAbout: TMenuItem;
     menuDocumentation: TMenuItem;
-    RzDialogButtonsMain: TRzDialogButtons;
+    menuExit: TMenuItem;
+    menuFile: TMenuItem;
+    menuHelp: TMenuItem;
+    menuNew: TMenuItem;
+    menuOpen: TMenuItem;
+    menuRecent: TMenuItem;
+    menuSave: TMenuItem;
     menuSaveAs: TMenuItem;
+    menuSettings: TMenuItem;
+    RzDialogButtonsMain: TRzDialogButtons;
+    RzFormState: TRzFormState;
     RzIniProject: TRzRegIniFile;
-    FileOpenDialog: TFileOpenDialog;
-    menuReopen: TMenuItem;
+    RzLauncherMain: TRzLauncher;
+    RzPanelRoot: TRzPanel;
+    RzPanelSource: TRzPanel;
+    RzRegApp: TRzRegIniFile;
     RzSaveDialog: TRzSaveDialog;
+    RzSelectFolderDialog: TRzSelectFolderDialog;
+    RzStatusPaneCopyright: TRzStatusPane;
+    RzStatusPaneSpacer: TRzStatusPane;
+    RzStatusPaneVersion: TRzVersionInfoStatus;
+    RzVersionInfo: TRzVersionInfo;
+    StatusBar: TRzStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -89,17 +87,24 @@ type
     procedure OpenSettingsDialog;
     procedure PromptSaveProject;
     procedure OpenProject;
+    procedure AddRecentProject(ProjectPath: String);
+    procedure RemoveRecentProject(ProjectPath: String);
+    procedure UpdateRecentProjectsMenu;
+    procedure CheckProjectMigration;
+    procedure CheckOpenSettings;
   private
     procedure SaveProject;
-    { Private declarations }
+    procedure RecentProjectClick(Sender: TObject);
   public
-    { Public declarations }
+    //
   protected
     procedure WMDropFiles(var Msg: TWMDropFiles); message WM_DROPFILES;
   end;
 
 var
   frmMain: TfrmMain;
+  MenuItems: array [0 .. 5] of TMenuItem;
+  RecentProjects: TStringList;
   ProjectChanged: Boolean;
   ProjectPath: string;
 
@@ -119,328 +124,11 @@ begin
   Result := Copy(resultStr, 1, Length(resultStr) - 1);
 end;
 
-procedure TfrmMain.OpenProject;
-var
-  idx, tmpIdx: Integer;
-  strings: TStringList;
-  folderName, tmpStr: String;
-begin
-  if FileExists(ProjectPath) then begin
-    // write the changes to the file
-    RzIniProject.path := ProjectPath;
-    // Root directory
-    editRootDirectory.Text := RzIniProject.ReadString(keyRoot, keyRootDirectory,
-      editRootDirectory.Text);
-    // Source Directories
-    strings := TStringList.Create();
-    RzIniProject.ReadSectionValues(keySource, strings);
-    if strings.Count > 0 then begin
-      for idx := 0 to strings.Count - 1 do begin
-        tmpStr := strings[idx];
-        tmpIdx := tmpStr.IndexOf('=');
-        if tmpIdx > -1 then begin
-          folderName := Copy(tmpStr, tmpIdx + 2, 99);
-          listSourceDirectories.Add(folderName);
-        end else begin
-          MessageDialogCentered(Format('Invalid Source Directory: "%s"',
-            [tmpStr]));
-        end;
-      end;
-    end;
-    ProjectChanged := False;
-  end;
-end;
-
-procedure TfrmMain.SaveProject;
-var
-  idx: Integer;
-begin
-  if ProjectPath.IsEmpty then begin
-    if RzSaveDialog.Execute then begin
-      ProjectPath := RzSaveDialog.FileName;
-    end else begin
-      Exit;
-    end;
-  end;
-
-  RzIniProject.path := ProjectPath;
-  // Root directory
-  RzIniProject.WriteString(keyRoot, keyRootDirectory, editRootDirectory.Text);
-  // Source Directories
-  for idx := 0 to listSourceDirectories.Count - 1 do begin
-    RzIniProject.WriteString(keySource, 'source' + IntToStr(idx),
-      listSourceDirectories.items[idx]);
-  end;
-  ProjectChanged := False;
-end;
-
-procedure TfrmMain.PromptSaveProject;
-begin
-  if ProjectChanged then begin
-    if MessageConfirmationCentered('Confirmation',
-      'Save changes to the project?') then begin
-      SaveProject();
-    end;
-  end;
-end;
-
-procedure TfrmMain.OpenSettingsDialog;
-var
-  settingsForm: TfrmSettings;
-begin
-  settingsForm := TfrmSettings.Create(nil);
-  settingsForm.ShowModal;
-  settingsForm.Free;
-end;
-
-procedure TfrmMain.RzDialogButtonsMainClickCancel(Sender: TObject);
-begin
-  PromptSaveProject();
-  RzFormState.SaveState;
-  Application.Terminate;
-end;
-
-procedure TfrmMain.RzDialogButtonsMainClickOk(Sender: TObject);
-var
-  startForm: TfrmStart;
-  processingForm: TfrmProcessing;
-begin
-  PromptSaveProject();
-  startForm := TfrmStart.Create(nil);
-  startForm.ShowModal;
-  if startForm.ModalResult = mrOk then begin
-    processingForm := TfrmProcessing.Create(nil);
-    processingForm.ShowModal;
-    processingForm.Free;
-  end;
-  startForm.Free;
-end;
-
-procedure TfrmMain.RzStatusPaneCopyrightClick(Sender: TObject);
-begin
-  RzLauncherMain.FileName := FumblyURL;
-  RzLauncherMain.Launch;
-end;
-
-procedure TfrmMain.setButtonState;
-begin
-  btnAddSourceDirectory.Enabled := Length(editRootDirectory.Text) > 0;
-  RzDialogButtonsMain.EnableOk := (Length(editRootDirectory.Text) > 0) and
-    (listSourceDirectories.items.Count > 0);
-end;
-
-procedure TfrmMain.UpdateSourceFolderCaption;
-begin
-  labelSourceDirectories.Caption := Format('Source Folders (%d)',
-    [listSourceDirectories.items.Count]);
-end;
-
-procedure TfrmMain.ActionSourceItemSelectionChangeExecute(Sender: TObject);
-begin
-  btnRemoveSourceDirectory.Enabled := listSourceDirectories.ItemIndex > -1;
-end;
-
-procedure TfrmMain.btnAddSourceDirectoryClick(Sender: TObject);
-var
-  tmpPath: string;
-begin
-  RzSelectFolderDialog.SelectedPathName := editRootDirectory.Text;
-  if RzSelectFolderDialog.Execute then begin
-    tmpPath := ExtractFileName(RzSelectFolderDialog.SelectedPathName);
-    if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
-      listSourceDirectories.Add(tmpPath);
-      UpdateSourceFolderCaption();
-      setButtonState();
-      ProjectChanged := True;
-    end else begin
-      MessageDialogCentered('Item already exists');
-    end;
-  end;
-end;
-
-procedure TfrmMain.btnClearSourceDirectoriesClick(Sender: TObject);
-begin
-  listSourceDirectories.Clear;
-  UpdateSourceFolderCaption();
-  setButtonState();
-  ProjectChanged := True;
-end;
-
-procedure TfrmMain.btnRemoveSourceDirectoryClick(Sender: TObject);
-begin
-  listSourceDirectories.Delete(listSourceDirectories.ItemIndex);
-  setButtonState();
-  ProjectChanged := True;
-end;
-
-procedure TfrmMain.editRootDirectoryButtonClick(Sender: TObject);
-begin
-  if RzSelectFolderDialog.Execute then begin
-    editRootDirectory.Text := RzSelectFolderDialog.SelectedPathName;
-    ProjectChanged := True;
-  end;
-end;
-
-procedure TfrmMain.editRootDirectoryChange(Sender: TObject);
-begin
-  setButtonState();
-  ProjectChanged := True;
-end;
-
-
-// =============================================================
-// Menu routinees
-// =============================================================
-
-procedure TfrmMain.menuSaveAsClick(Sender: TObject);
-// Save the configuration to a new project
-begin
-  // Prompt for the new project file
-  if RzSaveDialog.Execute then begin
-    ProjectPath := RzSaveDialog.FileName;
-    SaveProject();
-  end;
-end;
-
-procedure TfrmMain.menuSaveClick(Sender: TObject);
-begin
-  SaveProject();
-end;
-
-procedure TfrmMain.menuNewClick(Sender: TObject);
-begin
-  Codesite.Send('New');
-  editRootDirectory.Clear;
-  listSourceDirectories.Clear;
-end;
-
-procedure TfrmMain.menuOpenClick(Sender: TObject);
-begin
-  if FileOpenDialog.Execute then begin
-    ProjectPath := FileOpenDialog.FileName;
-    SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProjectPath,
-      ProjectPath);
-    OpenProject();
-  end;
-
-  // TODO: Update the recent project list
-  Codesite.Send('Update the recent project list');
-end;
-
-procedure TfrmMain.menuAboutClick(Sender: TObject);
-var
-  aboutForm: TfrmAbout;
-begin
-  aboutForm := TfrmAbout.Create(nil);
-  aboutForm.ShowModal;
-  aboutForm.Free;
-end;
-
-procedure TfrmMain.menuDocumentationClick(Sender: TObject);
-begin
-  RzLauncherMain.FileName := DocsURL;
-  RzLauncherMain.Launch;
-end;
-
-procedure TfrmMain.menuSettingsClick(Sender: TObject);
-begin
-  OpenSettingsDialog();
-end;
-
-// =============================================================
-// Toolbar button routines
-// =============================================================
-
-procedure TfrmMain.btnStartClick(Sender: TObject);
-var
-  startForm: TfrmStart;
-  processingForm: TfrmProcessing;
-begin
-  PromptSaveProject();
-
-  startForm := TfrmStart.Create(nil);
-  startForm.ShowModal;
-  if startForm.ModalResult = mrOk then begin
-    processingForm := TfrmProcessing.Create(nil);
-    processingForm.ShowModal;
-    processingForm.Free;
-  end;
-  startForm.Free;
-end;
-
-procedure TfrmMain.btnCloseClick(Sender: TObject);
-begin
-  PromptSaveProject();
-  RzFormState.SaveState;
-  Application.Terminate;
-end;
-
-procedure TfrmMain.WMDropFiles(var Msg: TWMDropFiles);
-// supports dragged and dropped folders
-var
-  attrs: DWORD;
-  i, NumFiles, FilenameLength: Integer;
-  filePath, s, rootPath, tmpPath: string;
-begin
-  NumFiles := DragQueryFile(Msg.Drop, $FFFFFFFF, nil, 0);
-  for i := 0 to NumFiles - 1 do begin
-    FilenameLength := DragQueryFile(Msg.Drop, i, nil, 0) + 1;
-    SetLength(s, FilenameLength);
-    DragQueryFile(Msg.Drop, i, PChar(s), FilenameLength);
-    // is it a directory?
-    attrs := GetFileAttributes(PChar(s));
-    if attrs = INVALID_FILE_ATTRIBUTES then begin
-      MessageDialogCentered('Invalid file attributes');
-      Exit;
-    end else if (attrs and FILE_ATTRIBUTE_DIRECTORY) <> 0 then begin
-      rootPath := IncludeTrailingBackslash(editRootDirectory.Text);
-      filePath := ExtractFilePath(s);
-      if rootPath = filePath then begin
-        tmpPath := ExtractFileName(s);
-        if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
-          listSourceDirectories.Add(ExtractFileName(tmpPath));
-        end;
-      end else begin
-        MessageDialogCentered('Dropped folder(s) do not match Root Directory');
-        Exit;
-      end;
-    end;
-  end;
-  DragFinish(Msg.Drop);
-  UpdateSourceFolderCaption();
-  setButtonState();
-end;
-
-procedure TfrmMain.FormCreate(Sender: TObject);
-var
-  tmpPath: String;
-begin
-  RzVersionInfo.filePath := Application.ExeName;
-  RzRegApp.path := AppRegistryKey;
-  DragAcceptFiles(Handle, True);
-  ProjectPath := '';
-  RzSaveDialog.InitialDir := TPath.GetDocumentsPath();
-
-  tmpPath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-    keyProjectPath, '');
-  if not tmpPath.IsEmpty() then begin
-    if FileExists(tmpPath) then begin
-      ProjectPath := tmpPath;
-      OpenProject();
-    end;
-  end;
-  UpdateSourceFolderCaption();
-
-  // TODO: Populate the Recent Projects submenu
-  Codesite.Send('Populate the Recent Projects menu');
-end;
-
-procedure TfrmMain.FormActivate(Sender: TObject);
+procedure TfrmMain.CheckOpenSettings;
 var
   OpenSettings: Boolean;
   exePath: String;
 begin
-  setButtonState();
   // should we open the settings dialog?
   OpenSettings := False;
   exePath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
@@ -463,8 +151,458 @@ begin
   // does the file exist?
   OpenSettings := OpenSettings or not FileExists(exePath, False);
   if OpenSettings then begin
-    OpenSettingsDialog();
+    OpenSettingsDialog;
   end;
+end;
+
+procedure TfrmMain.CheckProjectMigration;
+const
+  keyRootDirectory = 'RootDirectory';
+  keySourceDirectories = 'SourceDirectories';
+var
+  tmpStr: string;
+  theStrings: TStringList;
+begin
+  // Do the two registry settings exist?
+  if CheckRegistryValue(HKEY_CURRENT_USER, AppRegistryKey, keyRootDirectory) or
+    CheckRegistryValue(HKEY_CURRENT_USER, AppRegistryKey, keySourceDirectories)
+  then begin
+    utils.MessageDialogCentered('Migrating to Project-based operating model');
+    // Import existing details into the current screen
+    // Root Directory
+    editRootDirectory.text := ReadRegistryString(HKEY_CURRENT_USER,
+      AppRegistryKey, keyRootDirectory);
+    // Source Directories
+    theStrings := TStringList.Create;
+    tmpStr := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
+      keySourceDirectories);
+    if Length(tmpStr) > 0 then begin
+      Split(';', tmpStr, theStrings);
+      listSourceDirectories.items.AddStrings(theStrings);
+    end;
+    theStrings.Free;
+    // Save the project
+    if RzSaveDialog.Execute then begin
+      ProjectPath := RzSaveDialog.FileName;
+      SaveProject;
+      // Delete the registry keys
+      DeleteRegistryValue(HKEY_CURRENT_USER, AppRegistryKey, keyRootDirectory);
+      DeleteRegistryValue(HKEY_CURRENT_USER, AppRegistryKey,
+        keySourceDirectories);
+    end;
+  end;
+end;
+
+procedure TfrmMain.UpdateRecentProjectsMenu;
+var
+  idx: Integer;
+begin
+  menuRecent.Clear;
+  For idx := 0 to RecentProjects.Count - 1 do begin
+    MenuItems[idx] := TMenuItem.Create(Self);
+    MenuItems[idx].Caption := RecentProjects.strings[idx];
+    MenuItems[idx].OnClick := RecentProjectClick;
+    menuRecent.Add(MenuItems[idx]);
+  end;
+end;
+
+procedure TfrmMain.RecentProjectClick(Sender: TObject);
+var
+  MenuItem: TMenuItem;
+  tmpPath: String;
+begin
+  MenuItem := Sender as TMenuItem;
+  // Had to do this this way because Delphi/Windows automatically adds a
+  // shortcut character (&) in the caption.
+  tmpPath := RecentProjects[MenuItem.MenuIndex];
+  if FileExists(tmpPath) then begin
+    ProjectPath := tmpPath;
+    OpenProject;
+  end else begin
+    MessageDialogCentered(Format('Selected Project does not exist (%s)',
+      [tmpPath]));
+    RemoveRecentProject(tmpPath);
+  end;
+end;
+
+procedure TfrmMain.RemoveRecentProject(ProjectPath: String);
+var
+  idx: Integer;
+begin
+  idx := RecentProjects.IndexOf(ProjectPath);
+  if idx > -1 then begin
+    RecentProjects.Delete(idx);
+  end;
+end;
+
+procedure TfrmMain.OpenProject;
+var
+  idx, tmpIdx: Integer;
+  strings: TStringList;
+  folderName, tmpStr: String;
+begin
+  if FileExists(ProjectPath) then begin
+    // clear the UI
+    editRootDirectory.Clear;
+    listSourceDirectories.Clear;
+    // write the changes to the file
+    RzIniProject.path := ProjectPath;
+    // Root directory
+    editRootDirectory.text := RzIniProject.ReadString(keyRoot, keyRootDirectory,
+      editRootDirectory.text);
+    // Source Directories
+    strings := TStringList.Create();
+    RzIniProject.ReadSectionValues(keySource, strings);
+    if strings.Count > 0 then begin
+      for idx := 0 to strings.Count - 1 do begin
+        tmpStr := strings[idx];
+        tmpIdx := tmpStr.IndexOf('=');
+        if tmpIdx > -1 then begin
+          folderName := Copy(tmpStr, tmpIdx + 2, 99);
+          listSourceDirectories.Add(folderName);
+        end else begin
+          MessageDialogCentered(Format('Invalid Source Directory: "%s"',
+            [tmpStr]));
+        end;
+      end;
+    end;
+    // Put the project name in the form caption
+    frmMain.Caption := Format('%s: %s',
+      [ApplicationName, TPath.GetFileNameWithoutExtension(ProjectPath)]);
+    UpdateSourceFolderCaption;
+    ProjectChanged := False;
+    AddRecentProject(ProjectPath);
+    UpdateRecentProjectsMenu;
+  end;
+end;
+
+procedure TfrmMain.SaveProject;
+var
+  idx: Integer;
+begin
+  if ProjectPath.IsEmpty then begin
+    if RzSaveDialog.Execute then begin
+      ProjectPath := RzSaveDialog.FileName;
+    end else begin
+      Exit;
+    end;
+  end;
+
+  RzIniProject.path := ProjectPath;
+  // Root directory
+  RzIniProject.WriteString(keyRoot, keyRootDirectory, editRootDirectory.text);
+  // Source Directories
+  for idx := 0 to listSourceDirectories.Count - 1 do begin
+    RzIniProject.WriteString(keySource, 'source' + IntToStr(idx),
+      listSourceDirectories.items[idx]);
+  end;
+  ProjectChanged := False;
+end;
+
+procedure TfrmMain.PromptSaveProject;
+begin
+  if ProjectChanged then begin
+    if MessageConfirmationCentered('Confirmation',
+      'Save changes to the project?') then begin
+      SaveProject;
+    end;
+  end;
+end;
+
+procedure TfrmMain.OpenSettingsDialog;
+var
+  settingsForm: TfrmSettings;
+begin
+  settingsForm := TfrmSettings.Create(nil);
+  settingsForm.ShowModal;
+  settingsForm.Free;
+end;
+
+procedure TfrmMain.RzDialogButtonsMainClickCancel(Sender: TObject);
+begin
+  PromptSaveProject;
+  RzFormState.SaveState;
+  Application.Terminate;
+end;
+
+procedure TfrmMain.RzDialogButtonsMainClickOk(Sender: TObject);
+var
+  startForm: TfrmStart;
+  processingForm: TfrmProcessing;
+begin
+  PromptSaveProject;
+  startForm := TfrmStart.Create(nil);
+  startForm.ShowModal;
+  if startForm.ModalResult = mrOk then begin
+    processingForm := TfrmProcessing.Create(nil);
+    processingForm.ShowModal;
+    processingForm.Free;
+  end;
+  startForm.Free;
+end;
+
+procedure TfrmMain.RzStatusPaneCopyrightClick(Sender: TObject);
+begin
+  RzLauncherMain.FileName := FumblyURL;
+  RzLauncherMain.Launch;
+end;
+
+procedure TfrmMain.setButtonState;
+begin
+  btnAddSourceDirectory.Enabled := Length(editRootDirectory.text) > 0;
+  RzDialogButtonsMain.EnableOk := (Length(editRootDirectory.text) > 0) and
+    (listSourceDirectories.items.Count > 0);
+end;
+
+procedure TfrmMain.UpdateSourceFolderCaption;
+begin
+  labelSourceDirectories.Caption := Format('Source Folders (%d)',
+    [listSourceDirectories.items.Count]);
+end;
+
+procedure TfrmMain.ActionSourceItemSelectionChangeExecute(Sender: TObject);
+begin
+  btnRemoveSourceDirectory.Enabled := listSourceDirectories.ItemIndex > -1;
+end;
+
+procedure TfrmMain.AddRecentProject(ProjectPath: String);
+var
+  itemIdx: Integer;
+begin
+  itemIdx := RecentProjects.IndexOf(ProjectPath);
+  if itemIdx > -1 then begin
+    // the item is in the list
+    if itemIdx < 1 then begin
+      // its the first item, so we're good here
+      Exit;
+    end;
+    // it's not the first item, so delete it where it is
+    RecentProjects.Delete(itemIdx);
+  end;
+  // insert the project in the list (at the beginning)
+  RecentProjects.Insert(0, ProjectPath);
+  if RecentProjects.Count > 5 then begin
+    RecentProjects.Delete(5);
+  end;
+  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyRecentProjects,
+    CreatePathStr(RecentProjects));
+end;
+
+procedure TfrmMain.btnAddSourceDirectoryClick(Sender: TObject);
+var
+  tmpPath: string;
+begin
+  RzSelectFolderDialog.SelectedPathName := editRootDirectory.text;
+  if RzSelectFolderDialog.Execute then begin
+    tmpPath := ExtractFileName(RzSelectFolderDialog.SelectedPathName);
+    if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
+      listSourceDirectories.Add(tmpPath);
+      UpdateSourceFolderCaption;
+      setButtonState;
+      ProjectChanged := True;
+    end else begin
+      MessageDialogCentered('Item already exists');
+    end;
+  end;
+end;
+
+procedure TfrmMain.btnClearSourceDirectoriesClick(Sender: TObject);
+begin
+  listSourceDirectories.Clear;
+  UpdateSourceFolderCaption;
+  setButtonState;
+  ProjectChanged := True;
+end;
+
+procedure TfrmMain.btnRemoveSourceDirectoryClick(Sender: TObject);
+begin
+  listSourceDirectories.Delete(listSourceDirectories.ItemIndex);
+  setButtonState;
+  ProjectChanged := True;
+end;
+
+procedure TfrmMain.editRootDirectoryButtonClick(Sender: TObject);
+begin
+  if RzSelectFolderDialog.Execute then begin
+    editRootDirectory.text := RzSelectFolderDialog.SelectedPathName;
+    ProjectChanged := True;
+  end;
+end;
+
+procedure TfrmMain.editRootDirectoryChange(Sender: TObject);
+begin
+  setButtonState;
+  ProjectChanged := True;
+end;
+
+
+// =============================================================
+// Menu routinees
+// =============================================================
+
+procedure TfrmMain.menuSaveAsClick(Sender: TObject);
+// Save the configuration to a new project
+begin
+  // Prompt for the new project file
+  if RzSaveDialog.Execute then begin
+    ProjectPath := RzSaveDialog.FileName;
+    SaveProject;
+  end;
+end;
+
+procedure TfrmMain.menuSaveClick(Sender: TObject);
+begin
+  SaveProject;
+end;
+
+procedure TfrmMain.menuNewClick(Sender: TObject);
+begin
+  editRootDirectory.Clear;
+  listSourceDirectories.Clear;
+  ProjectPath := '';
+  ProjectChanged := False;
+end;
+
+procedure TfrmMain.menuOpenClick(Sender: TObject);
+begin
+  if FileOpenDialog.Execute then begin
+    ProjectPath := FileOpenDialog.FileName;
+    SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProjectPath,
+      ProjectPath);
+    OpenProject;
+  end;
+end;
+
+procedure TfrmMain.menuAboutClick(Sender: TObject);
+var
+  aboutForm: TfrmAbout;
+begin
+  aboutForm := TfrmAbout.Create(frmMain);
+  aboutForm.ShowModal;
+  aboutForm.Free;
+end;
+
+procedure TfrmMain.menuDocumentationClick(Sender: TObject);
+begin
+  RzLauncherMain.FileName := DocsURL;
+  RzLauncherMain.Launch;
+end;
+
+procedure TfrmMain.menuSettingsClick(Sender: TObject);
+begin
+  OpenSettingsDialog;
+end;
+
+// =============================================================
+// Toolbar button routines
+// =============================================================
+
+procedure TfrmMain.btnStartClick(Sender: TObject);
+var
+  startForm: TfrmStart;
+  processingForm: TfrmProcessing;
+begin
+  PromptSaveProject;
+
+  startForm := TfrmStart.Create(nil);
+  startForm.ShowModal;
+  if startForm.ModalResult = mrOk then begin
+    processingForm := TfrmProcessing.Create(nil);
+    processingForm.ShowModal;
+    processingForm.Free;
+  end;
+  startForm.Free;
+end;
+
+procedure TfrmMain.btnCloseClick(Sender: TObject);
+begin
+  PromptSaveProject;
+  RzFormState.SaveState;
+  Application.Terminate;
+end;
+
+// =============================================================
+// Drag and Drop
+// =============================================================
+
+procedure TfrmMain.WMDropFiles(var Msg: TWMDropFiles);
+// supports dragged and dropped folders
+var
+  attrs: DWORD;
+  i, NumFiles, FilenameLength: Integer;
+  filePath, s, rootPath, tmpPath: string;
+begin
+  frmMain.Cursor := crHourglass;
+  NumFiles := DragQueryFile(Msg.Drop, $FFFFFFFF, nil, 0);
+  for i := 0 to NumFiles - 1 do begin
+    FilenameLength := DragQueryFile(Msg.Drop, i, nil, 0) + 1;
+    SetLength(s, FilenameLength);
+    DragQueryFile(Msg.Drop, i, PChar(s), FilenameLength);
+    // is it a directory?
+    attrs := GetFileAttributes(PChar(s));
+    if attrs = INVALID_FILE_ATTRIBUTES then begin
+      MessageDialogCentered('Invalid file attributes');
+      Exit;
+    end else if (attrs and FILE_ATTRIBUTE_DIRECTORY) <> 0 then begin
+      rootPath := IncludeTrailingBackslash(editRootDirectory.text);
+      filePath := ExtractFilePath(s);
+      if rootPath = filePath then begin
+        tmpPath := ExtractFileName(s);
+        if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
+          listSourceDirectories.Add(ExtractFileName(tmpPath));
+        end;
+      end else begin
+        MessageDialogCentered('Dropped folder(s) do not match Root Directory');
+        Exit;
+      end;
+    end;
+  end;
+  DragFinish(Msg.Drop);
+  UpdateSourceFolderCaption;
+  setButtonState;
+  frmMain.Cursor := crDefault;
+end;
+
+// =============================================================
+// Lifecycle events
+// =============================================================
+
+procedure TfrmMain.FormCreate(Sender: TObject);
+var
+  tmpPath, tmpStr: String;
+begin
+  DragAcceptFiles(Handle, True);
+  ProjectPath := '';
+  frmMain.Caption := ApplicationName;
+  RzVersionInfo.filePath := Application.ExeName;
+  RzRegApp.path := AppRegistryKey;
+  RzSaveDialog.InitialDir := TPath.GetDocumentsPath;
+
+  // Populate the Recent Projects submenu
+  RecentProjects := TStringList.Create();
+  tmpStr := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
+    keyRecentProjects);
+  if Length(tmpStr) > 0 then begin
+    Split(';', tmpStr, RecentProjects);
+    listSourceDirectories.items.AddStrings(RecentProjects);
+  end;
+  UpdateRecentProjectsMenu;
+
+  tmpPath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
+    keyProjectPath, '');
+  if not tmpPath.IsEmpty then begin
+    if FileExists(tmpPath) then begin
+      ProjectPath := tmpPath;
+      OpenProject;
+    end;
+  end;
+end;
+
+procedure TfrmMain.FormActivate(Sender: TObject);
+begin
+  setButtonState;
+  CheckOpenSettings;
+  CheckProjectMigration;
 end;
 
 procedure TfrmMain.FormResize(Sender: TObject);
@@ -476,8 +614,9 @@ end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  Codesite.Send('Close');
-  PromptSaveProject();
+  PromptSaveProject;
+  // Free up the memory used by the list
+  RecentProjects.Free;
 end;
 
 end.

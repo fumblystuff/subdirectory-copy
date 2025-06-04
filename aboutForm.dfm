@@ -1,27 +1,99 @@
 object frmAbout: TfrmAbout
   Left = 0
   Top = 0
+  Anchors = [akLeft, akTop, akRight]
+  BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'About'
-  ClientHeight = 201
-  ClientWidth = 464
+  ClientHeight = 171
+  ClientWidth = 332
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Position = poOwnerFormCenter
+  Position = poMainFormCenter
+  OnCreate = FormCreate
+  DesignSize = (
+    332
+    171)
   TextHeight = 15
+  object LabelAboutApp: TLabel
+    AlignWithMargins = True
+    Left = 10
+    Top = 15
+    Width = 315
+    Height = 21
+    Alignment = taCenter
+    AutoSize = False
+    Caption = 'Subdirectory Copy'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object LabelAboutName: TLabel
+    AlignWithMargins = True
+    Left = 10
+    Top = 80
+    Width = 315
+    Height = 20
+    Alignment = taCenter
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'By John M. Wargo'
+  end
+  object LabelAboutCopyright: TLabel
+    AlignWithMargins = True
+    Left = 9
+    Top = 110
+    Width = 315
+    Height = 20
+    Alignment = taCenter
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'Copyright 2025, Fumbly Diddle Software'
+    Color = clBtnText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clHighlight
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentColor = False
+    ParentFont = False
+    OnClick = LabelAboutCopyrightClick
+  end
+  object LabelAboutVersion: TLabel
+    Left = 10
+    Top = 50
+    Width = 315
+    Height = 15
+    Alignment = taCenter
+    Anchors = [akLeft, akTop, akRight]
+    AutoSize = False
+    Caption = 'LabelAboutVersion'
+  end
   object RzDialogButtonsAbout: TRzDialogButtons
     Left = 0
-    Top = 165
-    Width = 464
+    Top = 135
+    Width = 332
     CaptionCancel = '&Close'
     ShowOKButton = False
     TabOrder = 0
-    ExplicitLeft = 232
-    ExplicitTop = 224
-    ExplicitWidth = 185
+    ExplicitTop = 157
+    ExplicitWidth = 462
+  end
+  object RzVersionInfoAbout: TRzVersionInfo
+    Left = 48
+    Top = 32
+  end
+  object RzLauncherAbout: TRzLauncher
+    Action = 'Open'
+    Timeout = -1
+    Left = 232
+    Top = 24
   end
 end

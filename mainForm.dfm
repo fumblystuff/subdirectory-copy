@@ -242,7 +242,7 @@ object frmMain: TfrmMain
         ShortCut = 16463
         OnClick = menuOpenClick
       end
-      object menuReopen: TMenuItem
+      object menuRecent: TMenuItem
         Caption = 'Recent...'
       end
       object menuSave: TMenuItem

@@ -3,6 +3,9 @@ unit Utils;
 interface
 
 uses
+
+  globals,
+
   System.Classes, System.SysUtils,
 
   Vcl.Controls, Vcl.Dialogs, Vcl.Forms,
@@ -11,14 +14,17 @@ uses
 
 procedure MessageDialogCentered(msg: String);
 function MessageConfirmationCentered(headerText, msg: String): boolean;
+function CheckRegistryValue(rootKey: HKEY; key, value: string): boolean;
+procedure RenameRegistryValue(rootKey: HKEY; key, oldValue, newValue: string);
+procedure DeleteRegistryValue(rootKey: HKEY; key, value: String);
 function ReadRegistryBool(rootKey: HKEY; key, valueName: String;
-  defaultValue: Boolean = false): Boolean;
+  defaultValue: boolean = false): boolean;
 function ReadRegistryString(rootKey: HKEY; key, valueName: String;
   defaultValue: String = ''): String;
 function ReadRegistryInteger(rootKey: HKEY; key, valueName: String;
   defaultValue: integer = 0): integer;
 procedure SaveRegistryBool(rootKey: HKEY; key, valueName: String;
-  value: Boolean);
+  value: boolean);
 procedure SaveRegistryInteger(rootKey: HKEY; key, valueName: String;
   value: integer);
 procedure SaveRegistryString(rootKey: HKEY; key, valueName: String;
@@ -64,8 +70,43 @@ begin
   Result := f.ModalResult = mrYes;
 end;
 
+function CheckRegistryValue(rootKey: HKEY; key, value: string): boolean;
+begin
+  Reg.rootKey := rootKey;
+  if Reg.KeyExists(key) then begin
+    if Reg.OpenKey(key, false) then begin
+      Result := Reg.ValueExists(value);
+    end;
+  end;
+end;
+
+procedure DeleteRegistryValue(rootKey: HKEY; key, value: String);
+begin
+  Reg.rootKey := rootKey;
+  if Reg.KeyExists(key) then begin
+    if Reg.OpenKey(key, true) then begin
+      if Reg.ValueExists(value) then begin
+        Reg.DeleteValue(value);
+      end;
+      Reg.CloseKey;
+    end;
+  end;
+end;
+
+procedure RenameRegistryValue(rootKey: HKEY; key, oldValue, newValue: string);
+begin
+  Reg.rootKey := rootKey;
+  if Reg.KeyExists(key) then begin
+    if Reg.OpenKey(key, false) then begin
+      if Reg.ValueExists(oldValue) then begin
+        Reg.RenameValue(oldValue, newValue);
+      end;
+    end;
+  end;
+end;
+
 function ReadRegistryBool(rootKey: HKEY; key, valueName: String;
-  defaultValue: Boolean = false): Boolean;
+  defaultValue: boolean = false): boolean;
 begin
   Reg.rootKey := rootKey;
   if Reg.KeyExists(key) then begin
@@ -83,7 +124,7 @@ begin
 end;
 
 procedure SaveRegistryBool(rootKey: HKEY; key, valueName: String;
-  value: Boolean);
+  value: boolean);
 begin
   Reg.rootKey := rootKey;
   if Reg.KeyExists(key) then begin
