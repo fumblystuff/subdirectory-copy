@@ -163,11 +163,19 @@ var
   tmpStr: string;
   theStrings: TStringList;
 begin
+  Codesite.Send('CheckProjectMigration');
   // Do the two registry settings exist?
   if CheckRegistryValue(HKEY_CURRENT_USER, AppRegistryKey, keyRootDirectory) or
     CheckRegistryValue(HKEY_CURRENT_USER, AppRegistryKey, keySourceDirectories)
   then begin
+
+    Codesite.Send('keyRootDirectory', ReadRegistryString(HKEY_CURRENT_USER,
+      AppRegistryKey, keyRootDirectory));
+    Codesite.Send('keySourceDirectories', ReadRegistryString(HKEY_CURRENT_USER,
+      AppRegistryKey, keySourceDirectories));
+
     utils.MessageDialogCentered('Migrating to Project-based operating model');
+    Codesite.Send('starting migration');
     // Import existing details into the current screen
     // Root Directory
     editRootDirectory.text := ReadRegistryString(HKEY_CURRENT_USER,
@@ -186,9 +194,11 @@ begin
       ProjectPath := RzSaveDialog.FileName;
       SaveProject;
       // Delete the registry keys
+      Codesite.Send('About to delete keys');
       DeleteRegistryValue(HKEY_CURRENT_USER, AppRegistryKey, keyRootDirectory);
       DeleteRegistryValue(HKEY_CURRENT_USER, AppRegistryKey,
         keySourceDirectories);
+      Codesite.Send('Done deleting keys');
     end;
   end;
 end;
