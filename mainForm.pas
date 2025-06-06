@@ -1,5 +1,8 @@
 unit mainForm;
 
+// TODO: Refactor app to use RzRegApp for all Registry interaction
+// TODO: Block secondary instances from running
+
 interface
 
 uses
@@ -7,7 +10,7 @@ uses
 
   CodesiteLogging,
 
-  JvExStdCtrls, JvCombobox, JvDriveCtrls, jclSysInfo,
+  JvExStdCtrls, JvCombobox, JvDriveCtrls, jclSysInfo, JvBaseDlg, JvWinDialogs,
 
   RzPanel, RzDlgBtn, RzEdit, RzBtnEdt, RzLabel, RzCommon, RzForms,
   RzStatus, RzLaunch, RzShellDialogs, RzButton, RzLstBox, RzFilSys,
@@ -18,9 +21,9 @@ uses
   System.ImageList, System.IOUtils, System.UITypes,
 
   Vcl.Controls, Vcl.Dialogs, Vcl.Forms, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Mask,
-  Vcl.ActnList, Vcl.Graphics, Vcl.ImgList, Vcl.FileCtrl,
+  Vcl.ActnList, Vcl.Graphics, Vcl.ImgList, Vcl.FileCtrl, Vcl.Menus,
 
-  Winapi.Windows, Winapi.Messages, Vcl.Menus, JvBaseDlg, JvWinDialogs;
+  Winapi.Windows, Winapi.Messages;
 
 type
   TfrmMain = class(TForm)
@@ -90,13 +93,11 @@ type
     procedure AddRecentProject(ProjectPath: String);
     procedure RemoveRecentProject(ProjectPath: String);
     procedure UpdateRecentProjectsMenu;
-    procedure CheckProjectMigration;
     procedure CheckOpenSettings;
   private
     procedure SaveProject;
     procedure RecentProjectClick(Sender: TObject);
   public
-    //
   protected
     procedure WMDropFiles(var Msg: TWMDropFiles); message WM_DROPFILES;
   end;
@@ -131,16 +132,14 @@ var
 begin
   // should we open the settings dialog?
   OpenSettings := False;
-  exePath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-    keyExecutable, '');
+  exePath := RzRegApp.ReadString(AppRegistryKey, keyExecutable, '');
   // do we have an executable path?
   if Length(exePath) < 1 then begin
     // No? Can we use the default?
     if FileExists(globals.TeraCopyDefaultPath) then begin
       // Yes!
       exePath := globals.TeraCopyDefaultPath;
-      SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-        keyExecutable, exePath);
+      RzRegApp.WriteString(AppRegistryKey, keyExecutable, exePath);
       Exit;
     end;
   end;
@@ -152,54 +151,6 @@ begin
   OpenSettings := OpenSettings or not FileExists(exePath, False);
   if OpenSettings then begin
     OpenSettingsDialog;
-  end;
-end;
-
-procedure TfrmMain.CheckProjectMigration;
-const
-  keyRootDirectory = 'RootDirectory';
-  keySourceDirectories = 'SourceDirectories';
-var
-  tmpStr: string;
-  theStrings: TStringList;
-begin
-  Codesite.Send('CheckProjectMigration');
-  // Do the two registry settings exist?
-  if CheckRegistryValue(HKEY_CURRENT_USER, AppRegistryKey, keyRootDirectory) or
-    CheckRegistryValue(HKEY_CURRENT_USER, AppRegistryKey, keySourceDirectories)
-  then begin
-
-    Codesite.Send('keyRootDirectory', ReadRegistryString(HKEY_CURRENT_USER,
-      AppRegistryKey, keyRootDirectory));
-    Codesite.Send('keySourceDirectories', ReadRegistryString(HKEY_CURRENT_USER,
-      AppRegistryKey, keySourceDirectories));
-
-    utils.MessageDialogCentered('Migrating to Project-based operating model');
-    Codesite.Send('starting migration');
-    // Import existing details into the current screen
-    // Root Directory
-    editRootDirectory.text := ReadRegistryString(HKEY_CURRENT_USER,
-      AppRegistryKey, keyRootDirectory);
-    // Source Directories
-    theStrings := TStringList.Create;
-    tmpStr := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-      keySourceDirectories);
-    if Length(tmpStr) > 0 then begin
-      Split(';', tmpStr, theStrings);
-      listSourceDirectories.items.AddStrings(theStrings);
-    end;
-    theStrings.Free;
-    // Save the project
-    if RzSaveDialog.Execute then begin
-      ProjectPath := RzSaveDialog.FileName;
-      SaveProject;
-      // Delete the registry keys
-      Codesite.Send('About to delete keys');
-      DeleteRegistryValue(HKEY_CURRENT_USER, AppRegistryKey, keyRootDirectory);
-      DeleteRegistryValue(HKEY_CURRENT_USER, AppRegistryKey,
-        keySourceDirectories);
-      Codesite.Send('Done deleting keys');
-    end;
   end;
 end;
 
@@ -585,7 +536,7 @@ begin
   ProjectPath := '';
   frmMain.Caption := ApplicationName;
   RzVersionInfo.filePath := Application.ExeName;
-  RzRegApp.path := AppRegistryKey;
+  RzRegApp.RegKey := hKeyCurrentUser;
   RzSaveDialog.InitialDir := TPath.GetDocumentsPath;
 
   // Populate the Recent Projects submenu
@@ -612,7 +563,6 @@ procedure TfrmMain.FormActivate(Sender: TObject);
 begin
   setButtonState;
   CheckOpenSettings;
-  CheckProjectMigration;
 end;
 
 procedure TfrmMain.FormResize(Sender: TObject);

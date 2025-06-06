@@ -50,8 +50,8 @@ var
   listFile: TextFile;
   closeCmd, doCopy: boolean;
   copiedFiles, sourceIdx, skippedFiles: integer;
-  closeStr, driveStr, listFilePath,  operationOption,
-    processingOption, rootPath, executablePath, tmpPath, tmpStr: string;
+  closeStr, driveStr, listFilePath, operationOption, processingOption, rootPath,
+    executablePath, tmpPath, tmpStr: string;
   sourceFolderList: TStringList;
 begin
   memoOutput.lines.Append('Validating process configuration');

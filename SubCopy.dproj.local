@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2025/05/25 08:47:48.000.990,D:\dev\fumbly-diddle\Delphi\subcopy\SubCopy.dproj=D:\dev\fumbly-diddle\Delphi\subcopy\msfcopy.dproj</Transaction>
+    <Transaction>2025/05/25 08:47:48.000.990,D:\dev\fumbly-diddle\Delphi\subcopy\msfcopy.dproj=D:\dev\fumbly-diddle\Delphi\subcopy\SubCopy.dproj</Transaction>
     <Transaction>2025/05/29 08:21:52.000.928,=D:\dev\fumbly-diddle\Delphi\subdirectory-copy\Unit1.pas</Transaction>
-    <Transaction>2025/05/29 08:22:31.000.570,D:\dev\fumbly-diddle\Delphi\subdirectory-copy\aboutForm.dfm=D:\dev\fumbly-diddle\Delphi\subdirectory-copy\Unit1.dfm</Transaction>
-    <Transaction>2025/05/29 08:22:31.000.570,D:\dev\fumbly-diddle\Delphi\subdirectory-copy\aboutForm.pas=D:\dev\fumbly-diddle\Delphi\subdirectory-copy\Unit1.pas</Transaction>
+    <Transaction>2025/05/29 08:22:31.000.570,D:\dev\fumbly-diddle\Delphi\subdirectory-copy\Unit1.pas=D:\dev\fumbly-diddle\Delphi\subdirectory-copy\aboutForm.pas</Transaction>
+    <Transaction>2025/05/29 08:22:31.000.570,D:\dev\fumbly-diddle\Delphi\subdirectory-copy\Unit1.dfm=D:\dev\fumbly-diddle\Delphi\subdirectory-copy\aboutForm.dfm</Transaction>
   </Transactions>
 </BorlandProject>
