@@ -6,8 +6,6 @@ uses
 
   globals,
 
-  CodesiteLogging,
-
   System.Classes, System.SysUtils,
 
   Vcl.Controls, Vcl.Dialogs, Vcl.Forms,
@@ -45,7 +43,6 @@ var
 procedure Split(const Delimiter: Char; Input: string;
   const theStrings: TStrings);
 begin
-  CodeSite.TraceMethod('Split');
   Assert(Assigned(theStrings));
   theStrings.StrictDelimiter := true;
   theStrings.Delimiter := Delimiter;
@@ -56,7 +53,6 @@ procedure MessageDialogCentered(msg: String);
 var
   f: TForm;
 begin
-  CodeSite.TraceMethod('MessageDialogCentered');
   f := CreateMessageDialog(msg, mtInformation, [mbOK]);
   f.Caption := 'Information';
   f.Position := poOwnerFormCenter;
@@ -67,7 +63,6 @@ function MessageConfirmationCentered(headerText, msg: String): boolean;
 var
   f: TForm;
 begin
-  CodeSite.TraceMethod('MessageConfirmationCentered');
   f := CreateMessageDialog(msg, mtConfirmation, [mbYes, mbNo]);
   f.Caption := headerText;
   f.Position := poOwnerFormCenter;
@@ -78,7 +73,6 @@ end;
 function CheckRegistryValue(rootKey: HKEY; key, value: string): boolean;
 begin
   Result := false;
-  CodeSite.TraceMethod('CheckRegistryValue');
   Reg.rootKey := rootKey;
   if Reg.KeyExists(key) then begin
     if Reg.OpenKey(key, false) then begin
@@ -89,28 +83,19 @@ end;
 
 procedure DeleteRegistryValue(rootKey: HKEY; key, value: String);
 begin
-  CodeSite.TraceMethod('DeleteRegistryValue');
   Reg.rootKey := rootKey;
-  CodeSite.Send(Format('Checking key: %s', [key]));
   if Reg.KeyExists(key) then begin
-    CodeSite.Send('Key exists');
     if Reg.OpenKey(key, true) then begin
-      CodeSite.Send('Key Opened');
       if Reg.ValueExists(value) then begin
-        CodeSite.Send('Value exists');
         Reg.DeleteValue(value);
       end;
       Reg.CloseKey;
     end;
-  end else begin
-    CodeSite.Send('Key does not exist');
-    CodeSite.Send(Format('Error: %d %s', [Reg.LastError, Reg.LastErrorMsg]));
   end;
 end;
 
 procedure RenameRegistryValue(rootKey: HKEY; key, oldValue, newValue: string);
 begin
-  CodeSite.TraceMethod('RenameRegistryValue');
   Reg.rootKey := rootKey;
   if Reg.KeyExists(key) then begin
     if Reg.OpenKey(key, false) then begin
@@ -124,7 +109,6 @@ end;
 function ReadRegistryBool(rootKey: HKEY; key, valueName: String;
   defaultValue: boolean = false): boolean;
 begin
-  CodeSite.TraceMethod('ReadRegistryBool');
   Result := defaultValue;
   Reg.rootKey := rootKey;
   if Reg.KeyExists(key) then begin
@@ -140,7 +124,6 @@ end;
 procedure SaveRegistryBool(rootKey: HKEY; key, valueName: String;
   value: boolean);
 begin
-  CodeSite.TraceMethod('SaveRegistryBool');
   Reg.rootKey := rootKey;
   if Reg.KeyExists(key) then begin
     if Reg.OpenKey(key, true) then begin
@@ -153,7 +136,6 @@ end;
 function ReadRegistryInteger(rootKey: HKEY; key, valueName: String;
   defaultValue: integer = 0): integer;
 begin
-  CodeSite.TraceMethod('ReadRegistryInteger');
   Result := defaultValue;
   Reg.rootKey := rootKey;
   if Reg.KeyExists(key) then begin
@@ -169,7 +151,6 @@ end;
 procedure SaveRegistryInteger(rootKey: HKEY; key, valueName: String;
   value: integer);
 begin
-  CodeSite.TraceMethod('SaveRegistryInteger');
   Reg.rootKey := rootKey;
   if Reg.KeyExists(key) then begin
     if Reg.OpenKey(key, true) then begin
@@ -182,7 +163,6 @@ end;
 function ReadRegistryString(rootKey: HKEY; key, valueName: String;
   defaultValue: String = ''): String;
 begin
-  CodeSite.TraceMethod('ReadRegistryString');
   Reg.rootKey := rootKey;
   if Reg.KeyExists(key) then begin
     if Reg.OpenKey(key, false) then begin
@@ -201,7 +181,6 @@ end;
 procedure SaveRegistryString(rootKey: HKEY; key, valueName: String;
   value: String);
 begin
-  CodeSite.TraceMethod('SaveRegistryString');
   Reg.rootKey := rootKey;
   if Reg.KeyExists(key) then begin
     if Reg.OpenKey(key, true) then begin
@@ -224,3 +203,4 @@ begin
 end;
 
 end.
+

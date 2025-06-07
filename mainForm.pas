@@ -8,7 +8,7 @@ interface
 uses
   aboutForm, globals, processingForm, settingsForm, startForm, utils,
 
-  CodesiteLogging,
+  // CodesiteLogging,
 
   JvExStdCtrls, JvCombobox, JvDriveCtrls, jclSysInfo, JvBaseDlg, JvWinDialogs,
 
@@ -153,6 +153,29 @@ begin
   if OpenSettings then begin
     OpenSettingsDialog;
   end;
+end;
+
+procedure TfrmMain.AddRecentProject(ProjectPath: String);
+var
+  itemIdx: Integer;
+begin
+  itemIdx := RecentProjects.IndexOf(ProjectPath);
+  if itemIdx > -1 then begin
+    // the item is in the list
+    if itemIdx < 1 then begin
+      // its the first item, so we're good here
+      Exit;
+    end;
+    // it's not the first item, so delete it where it is
+    RecentProjects.Delete(itemIdx);
+  end;
+  // insert the project in the list (at the beginning)
+  RecentProjects.Insert(0, ProjectPath);
+  if RecentProjects.Count > 5 then begin
+    RecentProjects.Delete(5);
+  end;
+  RzRegApp.WriteString(AppRegistryKey, keyRecentProjects,
+    CreatePathStr(RecentProjects));
 end;
 
 procedure TfrmMain.UpdateRecentProjectsMenu;
@@ -332,29 +355,6 @@ begin
   btnRemoveSourceDirectory.Enabled := listSourceDirectories.ItemIndex > -1;
 end;
 
-procedure TfrmMain.AddRecentProject(ProjectPath: String);
-var
-  itemIdx: Integer;
-begin
-  itemIdx := RecentProjects.IndexOf(ProjectPath);
-  if itemIdx > -1 then begin
-    // the item is in the list
-    if itemIdx < 1 then begin
-      // its the first item, so we're good here
-      Exit;
-    end;
-    // it's not the first item, so delete it where it is
-    RecentProjects.Delete(itemIdx);
-  end;
-  // insert the project in the list (at the beginning)
-  RecentProjects.Insert(0, ProjectPath);
-  if RecentProjects.Count > 5 then begin
-    RecentProjects.Delete(5);
-  end;
-  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyRecentProjects,
-    CreatePathStr(RecentProjects));
-end;
-
 procedure TfrmMain.btnAddSourceDirectoryClick(Sender: TObject);
 var
   tmpPath: string;
@@ -415,6 +415,7 @@ begin
     ProjectPath := RzSaveDialog.FileName;
     SaveProject;
     SetFormCaption;
+    AddRecentProject(ProjectPath);
     UpdateRecentProjectsMenu;
   end;
 end;
