@@ -86,7 +86,7 @@ type
     procedure menuOpenClick(Sender: TObject);
     procedure menuSaveClick(Sender: TObject);
     procedure menuSaveAsClick(Sender: TObject);
-    procedure UpdateSourceFolderCaption;
+    procedure SetSourceFolderCaption;
     procedure OpenSettingsDialog;
     procedure PromptSaveProject;
     procedure OpenProject;
@@ -94,6 +94,7 @@ type
     procedure RemoveRecentProject(ProjectPath: String);
     procedure UpdateRecentProjectsMenu;
     procedure CheckOpenSettings;
+    procedure SetFormCaption;
   private
     procedure SaveProject;
     procedure RecentProjectClick(Sender: TObject);
@@ -227,10 +228,8 @@ begin
         end;
       end;
     end;
-    // Put the project name in the form caption
-    frmMain.Caption := Format('%s: %s',
-      [ApplicationName, TPath.GetFileNameWithoutExtension(ProjectPath)]);
-    UpdateSourceFolderCaption;
+    SetFormCaption;
+    SetSourceFolderCaption;
     ProjectChanged := False;
     AddRecentProject(ProjectPath);
     UpdateRecentProjectsMenu;
@@ -315,7 +314,14 @@ begin
     (listSourceDirectories.items.Count > 0);
 end;
 
-procedure TfrmMain.UpdateSourceFolderCaption;
+procedure TfrmMain.SetFormCaption;
+begin
+  // Put the project name in the form caption
+  frmMain.Caption := Format('%s: %s',
+    [ApplicationName, TPath.GetFileNameWithoutExtension(ProjectPath)]);
+end;
+
+procedure TfrmMain.SetSourceFolderCaption;
 begin
   labelSourceDirectories.Caption := Format('Source Folders (%d)',
     [listSourceDirectories.items.Count]);
@@ -358,7 +364,7 @@ begin
     tmpPath := ExtractFileName(RzSelectFolderDialog.SelectedPathName);
     if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
       listSourceDirectories.Add(tmpPath);
-      UpdateSourceFolderCaption;
+      SetSourceFolderCaption;
       setButtonState;
       ProjectChanged := True;
     end else begin
@@ -370,7 +376,7 @@ end;
 procedure TfrmMain.btnClearSourceDirectoriesClick(Sender: TObject);
 begin
   listSourceDirectories.Clear;
-  UpdateSourceFolderCaption;
+  SetSourceFolderCaption;
   setButtonState;
   ProjectChanged := True;
 end;
@@ -408,6 +414,8 @@ begin
   if RzSaveDialog.Execute then begin
     ProjectPath := RzSaveDialog.FileName;
     SaveProject;
+    SetFormCaption;
+    UpdateRecentProjectsMenu;
   end;
 end;
 
@@ -519,7 +527,7 @@ begin
     end;
   end;
   DragFinish(Msg.Drop);
-  UpdateSourceFolderCaption;
+  SetSourceFolderCaption;
   setButtonState;
   frmMain.Cursor := crDefault;
 end;
