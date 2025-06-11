@@ -132,7 +132,6 @@ var
   exePath: String;
 begin
   // should we open the settings dialog?
-  OpenSettings := False;
   exePath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
     keyExecutable, '');
   // do we have an executable path?
