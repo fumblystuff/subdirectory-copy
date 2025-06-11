@@ -5,7 +5,7 @@ interface
 uses
   aboutForm, globals, processingForm, settingsForm, startForm, utils,
 
-  CodesiteLogging,
+  // CodesiteLogging,
 
   JclFileUtils,
 
@@ -185,7 +185,6 @@ begin
     RecentProjects.Delete(5);
   end;
   // Write the recent project list to the registry
-  Codesite.Send('Adding recent project', ProjectPath);
   SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyRecentProjects,
     CreatePathStr(RecentProjects));
   UpdateRecentProjectsMenu;
@@ -592,7 +591,7 @@ var
   tmpPath, tmpStr: String;
 begin
 
-  Codesite.Clear;
+  // Codesite.Clear;
 
   DragAcceptFiles(Handle, True);
   frmMain.Caption := ApplicationName;

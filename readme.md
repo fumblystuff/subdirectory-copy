@@ -2,10 +2,9 @@
 
 ## Tasks
 
-- [ ] Readme update
-- [ ] Video recording
 - [ ] Product page update
 - [ ] Docs update
+- [ ] Video recording
 - [ ] Publish v1.1 binary
 - [ ] Blog post
 - [ ] Refactor app to use RzRegApp for all Registry interaction
