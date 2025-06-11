@@ -1,14 +1,13 @@
 unit mainForm;
 
-// TODO: Refactor app to use RzRegApp for all Registry interaction
-// TODO: Block secondary instances from running
-
 interface
 
 uses
   aboutForm, globals, processingForm, settingsForm, startForm, utils,
 
-  // CodesiteLogging,
+  CodesiteLogging,
+
+  JclFileUtils,
 
   JvExStdCtrls, JvCombobox, JvDriveCtrls, jclSysInfo, JvBaseDlg, JvWinDialogs,
 
@@ -32,8 +31,7 @@ type
     btnAddSourceDirectory: TRzButton;
     btnClearSourceDirectories: TRzButton;
     btnRemoveSourceDirectory: TRzButton;
-    editRootDirectory: TRzButtonEdit;
-    FileOpenDialog: TFileOpenDialog;
+    editRootPath: TRzButtonEdit;
     labelRootDirectory: TLabel;
     labelSourceDirectories: TLabel;
     listSourceDirectories: TRzListBox;
@@ -55,7 +53,6 @@ type
     RzLauncherMain: TRzLauncher;
     RzPanelRoot: TRzPanel;
     RzPanelSource: TRzPanel;
-    RzRegApp: TRzRegIniFile;
     RzSaveDialog: TRzSaveDialog;
     RzSelectFolderDialog: TRzSelectFolderDialog;
     RzStatusPaneCopyright: TRzStatusPane;
@@ -63,6 +60,8 @@ type
     RzStatusPaneVersion: TRzVersionInfoStatus;
     RzVersionInfo: TRzVersionInfo;
     StatusBar: TRzStatusBar;
+    RzOpenDialog: TRzOpenDialog;
+    RzRegApp: TRzRegIniFile;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -73,9 +72,8 @@ type
     procedure btnClearSourceDirectoriesClick(Sender: TObject);
     procedure btnStartClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
-    procedure editRootDirectoryButtonClick(Sender: TObject);
-    procedure editRootDirectoryChange(Sender: TObject);
-    procedure setButtonState;
+    procedure editRootPathButtonClick(Sender: TObject);
+    procedure editRootPathChange(Sender: TObject);
     procedure RzStatusPaneCopyrightClick(Sender: TObject);
     procedure menuSettingsClick(Sender: TObject);
     procedure menuDocumentationClick(Sender: TObject);
@@ -94,6 +92,8 @@ type
     procedure RemoveRecentProject(ProjectPath: String);
     procedure UpdateRecentProjectsMenu;
     procedure CheckOpenSettings;
+    procedure DeleteTemporaryFile;
+    procedure setButtonState;
     procedure SetFormCaption;
   private
     procedure SaveProject;
@@ -108,7 +108,7 @@ var
   MenuItems: array [0 .. 5] of TMenuItem;
   RecentProjects: TStringList;
   ProjectChanged: Boolean;
-  ProjectPath: string;
+  ProjectPath, TemporaryFilePath: string;
 
 implementation
 
@@ -133,14 +133,16 @@ var
 begin
   // should we open the settings dialog?
   OpenSettings := False;
-  exePath := RzRegApp.ReadString(AppRegistryKey, keyExecutable, '');
+  exePath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
+    keyExecutable, '');
   // do we have an executable path?
-  if Length(exePath) < 1 then begin
+  if exePath.IsEmpty then begin
     // No? Can we use the default?
     if FileExists(globals.TeraCopyDefaultPath) then begin
       // Yes!
       exePath := globals.TeraCopyDefaultPath;
-      RzRegApp.WriteString(AppRegistryKey, keyExecutable, exePath);
+      SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
+        keyExecutable, exePath);
       Exit;
     end;
   end;
@@ -152,6 +154,14 @@ begin
   OpenSettings := OpenSettings or not FileExists(exePath, False);
   if OpenSettings then begin
     OpenSettingsDialog;
+  end;
+end;
+
+procedure TfrmMain.DeleteTemporaryFile;
+begin
+  // get rid of the temporary file if it exists
+  If FileExists(TemporaryFilePath) then begin
+    System.SysUtils.DeleteFile(TemporaryFilePath);
   end;
 end;
 
@@ -174,8 +184,11 @@ begin
   if RecentProjects.Count > 5 then begin
     RecentProjects.Delete(5);
   end;
-  RzRegApp.WriteString(AppRegistryKey, keyRecentProjects,
+  // Write the recent project list to the registry
+  Codesite.Send('Adding recent project', ProjectPath);
+  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyRecentProjects,
     CreatePathStr(RecentProjects));
+  UpdateRecentProjectsMenu;
 end;
 
 procedure TfrmMain.UpdateRecentProjectsMenu;
@@ -183,6 +196,7 @@ var
   idx: Integer;
 begin
   menuRecent.Clear;
+  menuRecent.Enabled := RecentProjects.Count > 0;
   For idx := 0 to RecentProjects.Count - 1 do begin
     MenuItems[idx] := TMenuItem.Create(Self);
     MenuItems[idx].Caption := RecentProjects.strings[idx];
@@ -200,6 +214,16 @@ begin
   // Had to do this this way because Delphi/Windows automatically adds a
   // shortcut character (&) in the caption.
   tmpPath := RecentProjects[MenuItem.MenuIndex];
+
+  // Are we changing anything?
+  if ProjectPath = tmpPath then begin
+    // Nothing to do here, no project change
+    Exit;
+  end;
+
+  // Offer to save the current project if it's changed
+  PromptSaveProject;
+
   if FileExists(tmpPath) then begin
     ProjectPath := tmpPath;
     OpenProject;
@@ -227,14 +251,16 @@ var
   folderName, tmpStr: String;
 begin
   if FileExists(ProjectPath) then begin
+    SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProjectPath,
+      ProjectPath);
+    AddRecentProject(ProjectPath);
     // clear the UI
-    editRootDirectory.Clear;
+    editRootPath.Clear;
     listSourceDirectories.Clear;
     // write the changes to the file
     RzIniProject.path := ProjectPath;
     // Root directory
-    editRootDirectory.text := RzIniProject.ReadString(keyRoot, keyRootDirectory,
-      editRootDirectory.text);
+    editRootPath.text := RzIniProject.ReadString(keyRoot, keyRootDirectory, '');
     // Source Directories
     strings := TStringList.Create();
     RzIniProject.ReadSectionValues(keySource, strings);
@@ -252,10 +278,9 @@ begin
       end;
     end;
     SetFormCaption;
+    setButtonState;
     SetSourceFolderCaption;
     ProjectChanged := False;
-    AddRecentProject(ProjectPath);
-    UpdateRecentProjectsMenu;
   end;
 end;
 
@@ -273,7 +298,7 @@ begin
 
   RzIniProject.path := ProjectPath;
   // Root directory
-  RzIniProject.WriteString(keyRoot, keyRootDirectory, editRootDirectory.text);
+  RzIniProject.WriteString(keyRoot, keyRootDirectory, editRootPath.text);
   // Source Directories
   for idx := 0 to listSourceDirectories.Count - 1 do begin
     RzIniProject.WriteString(keySource, 'source' + IntToStr(idx),
@@ -283,10 +308,17 @@ begin
 end;
 
 procedure TfrmMain.PromptSaveProject;
+var
+  tmpMsg: String;
 begin
   if ProjectChanged then begin
-    if MessageConfirmationCentered('Confirmation',
-      'Save changes to the project?') then begin
+    if Length(ProjectPath) > 0 then begin
+      tmpMsg := Format('Save changes to the "%s" project?',
+        [TPath.GetFileNameWithoutExtension(ProjectPath)]);
+    end else begin
+      tmpMsg := 'Save changes to the project?';
+    end;
+    if MessageConfirmationCentered('Confirmation', tmpMsg) then begin
       SaveProject;
     end;
   end;
@@ -304,6 +336,7 @@ end;
 procedure TfrmMain.RzDialogButtonsMainClickCancel(Sender: TObject);
 begin
   PromptSaveProject;
+  DeleteTemporaryFile;
   RzFormState.SaveState;
   Application.Terminate;
 end;
@@ -312,12 +345,21 @@ procedure TfrmMain.RzDialogButtonsMainClickOk(Sender: TObject);
 var
   startForm: TfrmStart;
   processingForm: TfrmProcessing;
+  i: Integer;
 begin
   PromptSaveProject;
   startForm := TfrmStart.Create(nil);
   startForm.ShowModal;
   if startForm.ModalResult = mrOk then begin
     processingForm := TfrmProcessing.Create(nil);
+    // Assign root folder
+    processingForm.RootPath := editRootPath.text;
+    // Assign subdirectory list
+    for i := 0 to listSourceDirectories.items.Count - 1 do begin
+      processingForm.SourceSubdirectoryList.Add
+        (listSourceDirectories.items.strings[i])
+    end;
+    processingForm.TemporaryFilePath := TemporaryFilePath;
     processingForm.ShowModal;
     processingForm.Free;
   end;
@@ -332,8 +374,8 @@ end;
 
 procedure TfrmMain.setButtonState;
 begin
-  btnAddSourceDirectory.Enabled := Length(editRootDirectory.text) > 0;
-  RzDialogButtonsMain.EnableOk := (Length(editRootDirectory.text) > 0) and
+  btnAddSourceDirectory.Enabled := Length(editRootPath.text) > 0;
+  RzDialogButtonsMain.EnableOk := (Length(editRootPath.text) > 0) and
     (listSourceDirectories.items.Count > 0);
 end;
 
@@ -359,7 +401,8 @@ procedure TfrmMain.btnAddSourceDirectoryClick(Sender: TObject);
 var
   tmpPath: string;
 begin
-  RzSelectFolderDialog.SelectedPathName := editRootDirectory.text;
+  RzSelectFolderDialog.Title := 'Select Source directory';
+  RzSelectFolderDialog.SelectedPathName := editRootPath.text;
   if RzSelectFolderDialog.Execute then begin
     tmpPath := ExtractFileName(RzSelectFolderDialog.SelectedPathName);
     if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
@@ -388,15 +431,16 @@ begin
   ProjectChanged := True;
 end;
 
-procedure TfrmMain.editRootDirectoryButtonClick(Sender: TObject);
+procedure TfrmMain.editRootPathButtonClick(Sender: TObject);
 begin
+  RzSelectFolderDialog.Title := 'Select Root directory';
   if RzSelectFolderDialog.Execute then begin
-    editRootDirectory.text := RzSelectFolderDialog.SelectedPathName;
+    editRootPath.text := RzSelectFolderDialog.SelectedPathName;
     ProjectChanged := True;
   end;
 end;
 
-procedure TfrmMain.editRootDirectoryChange(Sender: TObject);
+procedure TfrmMain.editRootPathChange(Sender: TObject);
 begin
   setButtonState;
   ProjectChanged := True;
@@ -416,7 +460,6 @@ begin
     SaveProject;
     SetFormCaption;
     AddRecentProject(ProjectPath);
-    UpdateRecentProjectsMenu;
   end;
 end;
 
@@ -427,7 +470,7 @@ end;
 
 procedure TfrmMain.menuNewClick(Sender: TObject);
 begin
-  editRootDirectory.Clear;
+  editRootPath.Clear;
   listSourceDirectories.Clear;
   ProjectPath := '';
   ProjectChanged := False;
@@ -435,10 +478,9 @@ end;
 
 procedure TfrmMain.menuOpenClick(Sender: TObject);
 begin
-  if FileOpenDialog.Execute then begin
-    ProjectPath := FileOpenDialog.FileName;
-    SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProjectPath,
-      ProjectPath);
+  PromptSaveProject;
+  if RzOpenDialog.Execute then begin
+    ProjectPath := RzOpenDialog.FileName;
     OpenProject;
   end;
 end;
@@ -448,6 +490,8 @@ var
   aboutForm: TfrmAbout;
 begin
   aboutForm := TfrmAbout.Create(frmMain);
+  aboutForm.FileVersionString := Format('Version %s',
+    [RzVersionInfo.FileVersion]);
   aboutForm.ShowModal;
   aboutForm.Free;
 end;
@@ -500,8 +544,14 @@ procedure TfrmMain.WMDropFiles(var Msg: TWMDropFiles);
 var
   attrs: DWORD;
   i, NumFiles, FilenameLength: Integer;
-  filePath, s, rootPath, tmpPath: string;
+  filePath, s, RootPath, tmpPath: string;
 begin
+  if Length(editRootPath.text) < 1 then begin
+    MessageDialogCentered
+      ('Please select a Root Directory before drqgging folder onto the application');
+    Exit;
+  end;
+
   frmMain.Cursor := crHourglass;
   NumFiles := DragQueryFile(Msg.Drop, $FFFFFFFF, nil, 0);
   for i := 0 to NumFiles - 1 do begin
@@ -514,9 +564,9 @@ begin
       MessageDialogCentered('Invalid file attributes');
       Exit;
     end else if (attrs and FILE_ATTRIBUTE_DIRECTORY) <> 0 then begin
-      rootPath := IncludeTrailingBackslash(editRootDirectory.text);
+      RootPath := IncludeTrailingBackslash(editRootPath.text);
       filePath := ExtractFilePath(s);
-      if rootPath = filePath then begin
+      if RootPath = filePath then begin
         tmpPath := ExtractFileName(s);
         if listSourceDirectories.IndexOf(tmpPath) < 0 then begin
           listSourceDirectories.Add(ExtractFileName(tmpPath));
@@ -534,27 +584,31 @@ begin
 end;
 
 // =============================================================
-// Lifecycle events
+// Form Lifecycle events
 // =============================================================
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
   tmpPath, tmpStr: String;
 begin
+
+  Codesite.Clear;
+
   DragAcceptFiles(Handle, True);
-  ProjectPath := '';
   frmMain.Caption := ApplicationName;
+  RzRegApp.path := AppRegistryKey;
   RzVersionInfo.filePath := Application.ExeName;
-  RzRegApp.RegKey := hKeyCurrentUser;
+  RzOpenDialog.InitialDir := TPath.GetDocumentsPath;
   RzSaveDialog.InitialDir := TPath.GetDocumentsPath;
+  ProjectPath := '';
+  TemporaryFilePath := FileGetTempName('scp');
 
   // Populate the Recent Projects submenu
   RecentProjects := TStringList.Create();
   tmpStr := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-    keyRecentProjects);
+    keyRecentProjects, '');
   if Length(tmpStr) > 0 then begin
     Split(';', tmpStr, RecentProjects);
-    listSourceDirectories.items.AddStrings(RecentProjects);
   end;
   UpdateRecentProjectsMenu;
 
@@ -584,7 +638,7 @@ end;
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   PromptSaveProject;
-  // Free up the memory used by the list
+  DeleteTemporaryFile;
   RecentProjects.Free;
 end;
 

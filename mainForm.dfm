@@ -98,7 +98,7 @@ object frmMain: TfrmMain
       Height = 15
       Caption = 'Root Directory'
     end
-    object editRootDirectory: TRzButtonEdit
+    object editRootPath: TRzButtonEdit
       Left = 95
       Top = 10
       Width = 513
@@ -106,10 +106,10 @@ object frmMain: TfrmMain
       Text = ''
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
-      OnChange = editRootDirectoryChange
+      OnChange = editRootPathChange
       AltBtnNumGlyphs = 1
       ButtonNumGlyphs = 1
-      OnButtonClick = editRootDirectoryButtonClick
+      OnButtonClick = editRootPathButtonClick
       ExplicitWidth = 511
     end
   end
@@ -199,23 +199,18 @@ object frmMain: TfrmMain
     Left = 120
     Top = 96
   end
-  object RzRegApp: TRzRegIniFile
-    PathType = ptRegistry
-    Left = 48
-    Top = 96
-  end
   object RzVersionInfo: TRzVersionInfo
     Left = 200
     Top = 96
   end
   object RzSelectFolderDialog: TRzSelectFolderDialog
     FormPosition = poMainFormCenter
-    Left = 72
-    Top = 160
+    Left = 232
+    Top = 168
   end
   object ActionList: TActionList
-    Left = 144
-    Top = 232
+    Left = 48
+    Top = 240
     object ActionSourceItemSelectionChange: TAction
       Caption = 'ActionSourceItemSelectionChange'
       OnExecute = ActionSourceItemSelectionChangeExecute
@@ -224,12 +219,12 @@ object frmMain: TfrmMain
   object RzLauncherMain: TRzLauncher
     Action = 'Open'
     Timeout = -1
-    Left = 280
-    Top = 160
+    Left = 368
+    Top = 96
   end
   object MainMenu: TMainMenu
-    Left = 72
-    Top = 232
+    Left = 128
+    Top = 240
     object menuFile: TMenuItem
       Caption = '&File'
       object menuNew: TMenuItem
@@ -244,6 +239,7 @@ object frmMain: TfrmMain
       end
       object menuRecent: TMenuItem
         Caption = 'Recent...'
+        Enabled = False
       end
       object menuSave: TMenuItem
         Caption = '&Save'
@@ -287,19 +283,25 @@ object frmMain: TfrmMain
     Left = 280
     Top = 96
   end
-  object FileOpenDialog: TFileOpenDialog
-    FavoriteLinks = <>
-    FileTypes = <>
-    Options = []
-    Left = 184
-    Top = 160
-  end
   object RzSaveDialog: TRzSaveDialog
     DefaultExt = 'scpy'
+    Title = 'Save SubCopy Project'
     Options = [osoCreatePrompt, osoHideReadOnly, osoOverwritePrompt, osoAllowTree, osoShowHints, osoOleDrag, osoOleDrop, osoShowHidden]
     Filter = 'SubCopy Project|*.scpy'
-    FormPosition = poOwnerFormCenter
-    Left = 240
-    Top = 232
+    FormPosition = poMainFormCenter
+    Left = 48
+    Top = 168
+  end
+  object RzOpenDialog: TRzOpenDialog
+    Title = 'Open SubCopy Project'
+    Filter = 'SubCopy Project|*.scpy'
+    FormPosition = poMainFormCenter
+    Left = 128
+    Top = 168
+  end
+  object RzRegApp: TRzRegIniFile
+    PathType = ptRegistry
+    Left = 48
+    Top = 96
   end
 end

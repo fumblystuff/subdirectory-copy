@@ -164,16 +164,13 @@ function ReadRegistryString(rootKey: HKEY; key, valueName: String;
   defaultValue: String = ''): String;
 begin
   Reg.rootKey := rootKey;
+  Result := defaultValue;
   if Reg.KeyExists(key) then begin
     if Reg.OpenKey(key, false) then begin
       if Reg.ValueExists(valueName) then begin
         Result := Reg.ReadString(valueName);
-      end else begin
-        Result := defaultValue;
       end;
       Reg.CloseKey;
-    end else begin
-      Result := defaultValue;
     end;
   end;
 end;
@@ -203,4 +200,3 @@ begin
 end;
 
 end.
-

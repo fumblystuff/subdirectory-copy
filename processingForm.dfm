@@ -15,6 +15,8 @@ object frmProcessing: TfrmProcessing
   Font.Style = []
   Position = poOwnerFormCenter
   OnActivate = FormActivate
+  OnClose = FormClose
+  OnCreate = FormCreate
   TextHeight = 15
   object memoOutput: TRzMemo
     Left = 0

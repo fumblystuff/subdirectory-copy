@@ -14,7 +14,7 @@ object frmAbout: TfrmAbout
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
-  OnCreate = FormCreate
+  OnActivate = FormActivate
   DesignSize = (
     332
     171)
@@ -39,18 +39,19 @@ object frmAbout: TfrmAbout
     AlignWithMargins = True
     Left = 10
     Top = 80
-    Width = 315
+    Width = 313
     Height = 20
     Alignment = taCenter
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 'By John M. Wargo'
+    ExplicitWidth = 315
   end
   object LabelAboutCopyright: TLabel
     AlignWithMargins = True
     Left = 9
     Top = 110
-    Width = 315
+    Width = 313
     Height = 20
     Alignment = taCenter
     Anchors = [akLeft, akTop, akRight]
@@ -65,16 +66,18 @@ object frmAbout: TfrmAbout
     ParentColor = False
     ParentFont = False
     OnClick = LabelAboutCopyrightClick
+    ExplicitWidth = 315
   end
   object LabelAboutVersion: TLabel
     Left = 10
     Top = 50
-    Width = 315
+    Width = 313
     Height = 15
     Alignment = taCenter
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
     Caption = 'LabelAboutVersion'
+    ExplicitWidth = 315
   end
   object RzDialogButtonsAbout: TRzDialogButtons
     Left = 0
@@ -83,12 +86,8 @@ object frmAbout: TfrmAbout
     CaptionCancel = '&Close'
     ShowOKButton = False
     TabOrder = 0
-    ExplicitTop = 157
-    ExplicitWidth = 462
-  end
-  object RzVersionInfoAbout: TRzVersionInfo
-    Left = 48
-    Top = 32
+    ExplicitTop = 127
+    ExplicitWidth = 330
   end
   object RzLauncherAbout: TRzLauncher
     Action = 'Open'

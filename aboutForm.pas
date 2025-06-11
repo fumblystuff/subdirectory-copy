@@ -21,15 +21,14 @@ type
     LabelAboutName: TLabel;
     LabelAboutCopyright: TLabel;
     RzDialogButtonsAbout: TRzDialogButtons;
-    RzVersionInfoAbout: TRzVersionInfo;
     LabelAboutVersion: TLabel;
     RzLauncherAbout: TRzLauncher;
-    procedure FormCreate(Sender: TObject);
     procedure LabelAboutCopyrightClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
   private
     { Private declarations }
   public
-    { Public declarations }
+    FileVersionString: String;
   end;
 
 var
@@ -39,11 +38,9 @@ implementation
 
 {$R *.dfm}
 
-procedure TfrmAbout.FormCreate(Sender: TObject);
+procedure TfrmAbout.FormActivate(Sender: TObject);
 begin
-  RzVersionInfoAbout.FilePath := Application.ExeName;
-  LabelAboutVersion.Caption := Format('Version %s',
-    [RzVersionInfoAbout.FileVersion]);
+  LabelAboutVersion.Caption := FileVersionString;
 end;
 
 procedure TfrmAbout.LabelAboutCopyrightClick(Sender: TObject);
