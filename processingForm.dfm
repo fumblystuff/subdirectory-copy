@@ -42,11 +42,4 @@ object frmProcessing: TfrmProcessing
     ExplicitTop = 397
     ExplicitWidth = 622
   end
-  object RzLauncher: TRzLauncher
-    Action = 'Open'
-    Timeout = -1
-    WaitType = wtProcessMessages
-    Left = 80
-    Top = 72
-  end
 end

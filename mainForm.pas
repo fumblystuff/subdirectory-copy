@@ -50,7 +50,7 @@ type
     RzDialogButtonsMain: TRzDialogButtons;
     RzFormState: TRzFormState;
     RzIniProject: TRzRegIniFile;
-    RzLauncherMain: TRzLauncher;
+    RzLauncher: TRzLauncher;
     RzPanelRoot: TRzPanel;
     RzPanelSource: TRzPanel;
     RzSaveDialog: TRzSaveDialog;
@@ -88,7 +88,7 @@ type
     procedure OpenSettingsDialog;
     procedure PromptSaveProject;
     procedure OpenProject;
-    procedure AddRecentProject(ProjectPath: String);
+    procedure AddRecentProject;
     procedure RemoveRecentProject(ProjectPath: String);
     procedure UpdateRecentProjectsMenu;
     procedure CheckOpenSettings;
@@ -164,7 +164,7 @@ begin
   end;
 end;
 
-procedure TfrmMain.AddRecentProject(ProjectPath: String);
+procedure TfrmMain.AddRecentProject;
 var
   itemIdx: Integer;
 begin
@@ -251,7 +251,7 @@ begin
   if FileExists(ProjectPath) then begin
     SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProjectPath,
       ProjectPath);
-    AddRecentProject(ProjectPath);
+    AddRecentProject;
     // clear the UI
     editRootPath.Clear;
     listSourceDirectories.Clear;
@@ -302,6 +302,8 @@ begin
     RzIniProject.WriteString(keySource, 'source' + IntToStr(idx),
       listSourceDirectories.items[idx]);
   end;
+  AddRecentProject;
+  SetFormCaption;
   ProjectChanged := False;
 end;
 
@@ -358,6 +360,7 @@ begin
         (listSourceDirectories.items.strings[i])
     end;
     processingForm.TemporaryFilePath := TemporaryFilePath;
+    processingForm.RzLauncher := RzLauncher;
     processingForm.ShowModal;
     processingForm.Free;
   end;
@@ -366,8 +369,8 @@ end;
 
 procedure TfrmMain.RzStatusPaneCopyrightClick(Sender: TObject);
 begin
-  RzLauncherMain.FileName := FumblyURL;
-  RzLauncherMain.Launch;
+  RzLauncher.FileName := FumblyURL;
+  RzLauncher.Launch;
 end;
 
 procedure TfrmMain.setButtonState;
@@ -380,8 +383,13 @@ end;
 procedure TfrmMain.SetFormCaption;
 begin
   // Put the project name in the form caption
-  frmMain.Caption := Format('%s: %s',
-    [ApplicationName, TPath.GetFileNameWithoutExtension(ProjectPath)]);
+  if ProjectPath.IsEmpty then begin
+    frmMain.Caption := ApplicationName;
+  end else begin
+    frmMain.Caption := Format('%s: %s',
+      [ApplicationName, TPath.GetFileNameWithoutExtension(ProjectPath)]);
+  end;
+
 end;
 
 procedure TfrmMain.SetSourceFolderCaption;
@@ -426,6 +434,7 @@ procedure TfrmMain.btnRemoveSourceDirectoryClick(Sender: TObject);
 begin
   listSourceDirectories.Delete(listSourceDirectories.ItemIndex);
   setButtonState;
+  SetSourceFolderCaption;
   ProjectChanged := True;
 end;
 
@@ -457,7 +466,7 @@ begin
     ProjectPath := RzSaveDialog.FileName;
     SaveProject;
     SetFormCaption;
-    AddRecentProject(ProjectPath);
+    AddRecentProject;
   end;
 end;
 
@@ -471,6 +480,7 @@ begin
   editRootPath.Clear;
   listSourceDirectories.Clear;
   ProjectPath := '';
+  SetFormCaption;
   ProjectChanged := False;
 end;
 
@@ -496,8 +506,8 @@ end;
 
 procedure TfrmMain.menuDocumentationClick(Sender: TObject);
 begin
-  RzLauncherMain.FileName := DocsURL;
-  RzLauncherMain.Launch;
+  RzLauncher.FileName := DocsURL;
+  RzLauncher.Launch;
 end;
 
 procedure TfrmMain.menuSettingsClick(Sender: TObject);

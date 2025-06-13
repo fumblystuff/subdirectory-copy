@@ -18,7 +18,6 @@ type
   TfrmProcessing = class(TForm)
     memoOutput: TRzMemo;
     ProcessingDialogButtons: TRzDialogButtons;
-    RzLauncher: TRzLauncher;
     procedure FormActivate(Sender: TObject);
     procedure ErrorOutput(msg: String);
     procedure WarnOutput(msg: String);
@@ -26,6 +25,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   public
     RootPath, TemporaryFilePath: String;
+        RzLauncher:  TRzLauncher;
     SourceSubdirectoryList: TStringList;
   private
     { private declarations }

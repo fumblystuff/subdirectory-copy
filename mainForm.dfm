@@ -216,7 +216,7 @@ object frmMain: TfrmMain
       OnExecute = ActionSourceItemSelectionChangeExecute
     end
   end
-  object RzLauncherMain: TRzLauncher
+  object RzLauncher: TRzLauncher
     Action = 'Open'
     Timeout = -1
     Left = 368
