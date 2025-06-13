@@ -7,7 +7,9 @@
 - [ ] Publish static site update
 - [ ] Publish docs update
 - [ ] Blog post
-- [ ] Refactor app to use RzRegApp for all Registry interaction
+
+## Future Tasks
+
 - [ ] Block secondary instances from running
 
 ## Introduction
