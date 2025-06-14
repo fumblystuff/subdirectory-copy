@@ -6,5 +6,4 @@ Win64
 installer/
 
 # Files
-setup.iss
 sub-copy-folderlist.txt

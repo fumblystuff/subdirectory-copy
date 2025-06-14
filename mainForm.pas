@@ -619,6 +619,19 @@ begin
   end;
   UpdateRecentProjectsMenu;
 
+  // if we have a command-line parameter and the specified file exists
+  // then launch it
+  if ParamCount > 0 then begin
+    // Grab the first parameter
+    tmpPath := ParamStr(1);
+    if FileExists(tmpPath) then begin
+      ProjectPath := tmpPath;
+      OpenProject;
+      Exit;
+    end;
+  end;
+
+  // otherwise launch the last project opened
   tmpPath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
     keyProjectPath, '');
   if not tmpPath.IsEmpty then begin
