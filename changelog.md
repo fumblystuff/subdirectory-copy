@@ -1,5 +1,11 @@
 # Changelog
 
+## 20250615 V1.1.0
+
++ Enhanced the application to allow users to save projects to disk and switch between them (open project).
++ Added **About** dialog
++ Added **File** and **About** menus
+
 ## 20250528 v1.0.8
 
 + Automatically populate the TeraCopy executable path using the default executable location.

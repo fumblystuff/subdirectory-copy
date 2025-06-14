@@ -12,6 +12,7 @@ object frmMain: TfrmMain
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Menu = MainMenu
   OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
@@ -29,10 +30,12 @@ object frmMain: TfrmMain
     BorderWidth = 0
     StyleElements = [seFont, seClient]
     TabOrder = 0
+    ExplicitTop = 411
+    ExplicitWidth = 622
     object RzStatusPaneCopyright: TRzStatusPane
       Left = 0
       Top = 0
-      Width = 521
+      Width = 522
       Height = 22
       BorderWidth = 0
       Align = alClient
@@ -44,14 +47,12 @@ object frmMain: TfrmMain
       ParentFont = False
       OnClick = RzStatusPaneCopyrightClick
       Caption = 'Copyright 2025 Fumbly Diddle Software'
-      ExplicitLeft = 176
-      ExplicitWidth = 448
-      ExplicitHeight = 19
+      ExplicitWidth = 524
     end
     object RzStatusPaneVersion: TRzVersionInfoStatus
-      Left = 521
+      Left = 522
       Top = 0
-      Width = 83
+      Width = 82
       Height = 22
       BorderWidth = 0
       Align = alRight
@@ -60,8 +61,7 @@ object frmMain: TfrmMain
       AutoSize = True
       Field = vifFileVersion
       VersionInfo = RzVersionInfo
-      ExplicitLeft = 504
-      ExplicitHeight = 19
+      ExplicitLeft = 519
     end
     object RzStatusPaneSpacer: TRzStatusPane
       Left = 604
@@ -75,9 +75,9 @@ object frmMain: TfrmMain
       ExplicitHeight = 19
     end
   end
-  object RzPanel2: TRzPanel
+  object RzPanelRoot: TRzPanel
     Left = 0
-    Top = 29
+    Top = 0
     Width = 624
     Height = 36
     Align = alTop
@@ -98,7 +98,7 @@ object frmMain: TfrmMain
       Height = 15
       Caption = 'Root Directory'
     end
-    object editRootDirectory: TRzButtonEdit
+    object editRootPath: TRzButtonEdit
       Left = 95
       Top = 10
       Width = 513
@@ -106,103 +106,26 @@ object frmMain: TfrmMain
       Text = ''
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
-      OnChange = editRootDirectoryChange
+      OnChange = editRootPathChange
       AltBtnNumGlyphs = 1
       ButtonNumGlyphs = 1
-      OnButtonClick = editRootDirectoryButtonClick
+      OnButtonClick = editRootPathButtonClick
       ExplicitWidth = 511
     end
   end
-  object RzToolbar: TRzToolbar
+  object RzPanelSource: TRzPanel
     Left = 0
-    Top = 0
+    Top = 36
     Width = 624
-    Height = 29
-    Images = ImageList
-    BorderInner = fsNone
-    BorderOuter = fsGroove
-    BorderSides = [sdTop]
-    BorderWidth = 0
-    Caption = 'Help'
-    TabOrder = 2
-    ExplicitWidth = 622
-    ToolbarControls = (
-      btnStart
-      RzSpacer1
-      btnSettings
-      RzSpacer2
-      btnHelp
-      RzSpacer3
-      btnClose)
-    object btnStart: TRzToolButton
-      Left = 4
-      Top = 2
-      Width = 50
-      Images = ImageList
-      ShowCaption = True
-      UseToolbarButtonSize = False
-      UseToolbarShowCaption = False
-      Caption = '&Start'
-      OnClick = btnStartClick
-    end
-    object RzSpacer1: TRzSpacer
-      Left = 54
-      Top = 2
-    end
-    object btnSettings: TRzToolButton
-      Left = 62
-      Top = 2
-      Width = 50
-      ShowCaption = True
-      UseToolbarButtonSize = False
-      UseToolbarShowCaption = False
-      Caption = 'Se&ttings'
-      ParentShowHint = False
-      ShowHint = False
-      OnClick = btnSettingsClick
-    end
-    object RzSpacer2: TRzSpacer
-      Left = 112
-      Top = 2
-    end
-    object btnClose: TRzToolButton
-      Left = 165
-      Top = 2
-      Width = 50
-      Images = ImageList
-      ShowCaption = True
-      UseToolbarButtonSize = False
-      UseToolbarShowCaption = False
-      Caption = '&Close'
-      OnClick = btnCloseClick
-    end
-    object RzSpacer3: TRzSpacer
-      Left = 157
-      Top = 2
-    end
-    object btnHelp: TRzToolButton
-      Left = 120
-      Top = 2
-      Width = 37
-      ShowCaption = True
-      UseToolbarShowCaption = False
-      Caption = 'Help'
-      OnClick = btnHelpClick
-    end
-  end
-  object RzPanel3: TRzPanel
-    Left = 0
-    Top = 65
-    Width = 624
-    Height = 354
+    Height = 347
     Align = alClient
     BorderOuter = fsNone
-    TabOrder = 3
+    TabOrder = 2
     ExplicitWidth = 622
-    ExplicitHeight = 349
+    ExplicitHeight = 339
     DesignSize = (
       624
-      354)
+      347)
     object labelSourceDirectories: TLabel
       Left = 10
       Top = 10
@@ -211,10 +134,10 @@ object frmMain: TfrmMain
       Caption = 'Source Directories'
     end
     object listSourceDirectories: TRzListBox
-      Left = 13
+      Left = 10
       Top = 31
       Width = 516
-      Height = 317
+      Height = 310
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = 2
       HorzScrollBar = True
@@ -226,7 +149,7 @@ object frmMain: TfrmMain
       OnEnter = ActionSourceItemSelectionChangeExecute
       OnExit = ActionSourceItemSelectionChangeExecute
       ExplicitWidth = 514
-      ExplicitHeight = 312
+      ExplicitHeight = 302
     end
     object btnAddSourceDirectory: TRzButton
       Left = 535
@@ -257,41 +180,128 @@ object frmMain: TfrmMain
       ExplicitLeft = 533
     end
   end
-  object RzFormState: TRzFormState
-    RegIniFile = RzRegIniFile
-    Left = 264
-    Top = 216
+  object RzDialogButtonsMain: TRzDialogButtons
+    Left = 0
+    Top = 383
+    Width = 624
+    CaptionOk = 'Start Copy'
+    CaptionCancel = 'Close'
+    EnableOk = False
+    WidthOk = 100
+    OnClickOk = RzDialogButtonsMainClickOk
+    OnClickCancel = RzDialogButtonsMainClickCancel
+    TabOrder = 3
+    ExplicitTop = 375
+    ExplicitWidth = 622
   end
-  object RzRegIniFile: TRzRegIniFile
-    PathType = ptRegistry
-    Left = 176
-    Top = 216
+  object RzFormState: TRzFormState
+    RegIniFile = RzRegApp
+    Left = 120
+    Top = 96
   end
   object RzVersionInfo: TRzVersionInfo
-    Left = 80
-    Top = 216
+    Left = 200
+    Top = 96
   end
   object RzSelectFolderDialog: TRzSelectFolderDialog
     FormPosition = poMainFormCenter
-    Left = 80
-    Top = 280
+    Left = 248
+    Top = 168
   end
   object ActionList: TActionList
-    Left = 360
-    Top = 216
+    Left = 48
+    Top = 240
     object ActionSourceItemSelectionChange: TAction
       Caption = 'ActionSourceItemSelectionChange'
       OnExecute = ActionSourceItemSelectionChangeExecute
     end
   end
-  object ImageList: TImageList
-    Left = 448
-    Top = 216
-  end
-  object RzLauncherMain: TRzLauncher
+  object RzLauncher: TRzLauncher
     Action = 'Open'
     Timeout = -1
-    Left = 200
-    Top = 280
+    Left = 368
+    Top = 96
+  end
+  object MainMenu: TMainMenu
+    Left = 128
+    Top = 240
+    object menuFile: TMenuItem
+      Caption = '&File'
+      object menuNew: TMenuItem
+        Caption = '&New'
+        ShortCut = 16462
+        OnClick = menuNewClick
+      end
+      object menuOpen: TMenuItem
+        Caption = '&Open'
+        ShortCut = 16463
+        OnClick = menuOpenClick
+      end
+      object menuRecent: TMenuItem
+        Caption = 'Recent...'
+        Enabled = False
+      end
+      object menuSave: TMenuItem
+        Caption = '&Save'
+        ShortCut = 16467
+        OnClick = menuSaveClick
+      end
+      object menuSaveAs: TMenuItem
+        Caption = 'Save As'
+        OnClick = menuSaveAsClick
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object menuSettings: TMenuItem
+        Caption = 'Se&ttings'
+        OnClick = menuSettingsClick
+      end
+      object Open2: TMenuItem
+        Caption = '-'
+      end
+      object menuExit: TMenuItem
+        Caption = 'E&xit'
+        ShortCut = 16499
+        OnClick = btnCloseClick
+      end
+    end
+    object menuHelp: TMenuItem
+      Caption = '&Help'
+      object menuAbout: TMenuItem
+        Caption = '&About'
+        OnClick = menuAboutClick
+      end
+      object menuDocumentation: TMenuItem
+        Caption = '&Documentation'
+        ShortCut = 112
+        OnClick = menuDocumentationClick
+      end
+    end
+  end
+  object RzIniProject: TRzRegIniFile
+    Left = 280
+    Top = 96
+  end
+  object RzSaveDialog: TRzSaveDialog
+    DefaultExt = 'scpy'
+    Title = 'Save SubCopy Project'
+    Options = [osoCreatePrompt, osoHideReadOnly, osoOverwritePrompt, osoAllowTree, osoShowHints, osoOleDrag, osoOleDrop, osoShowHidden]
+    Filter = 'SubCopy Project|*.scpy'
+    FormPosition = poMainFormCenter
+    Left = 48
+    Top = 168
+  end
+  object RzOpenDialog: TRzOpenDialog
+    Title = 'Open SubCopy Project'
+    Filter = 'SubCopy Project|*.scpy'
+    FormPosition = poMainFormCenter
+    Left = 136
+    Top = 168
+  end
+  object RzRegApp: TRzRegIniFile
+    PathType = ptRegistry
+    Left = 48
+    Top = 96
   end
 end

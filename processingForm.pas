@@ -18,14 +18,17 @@ type
   TfrmProcessing = class(TForm)
     memoOutput: TRzMemo;
     ProcessingDialogButtons: TRzDialogButtons;
-    RzLauncher: TRzLauncher;
     procedure FormActivate(Sender: TObject);
     procedure ErrorOutput(msg: String);
     procedure WarnOutput(msg: String);
-  private
-    { Private declarations }
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   public
-    { Public declarations }
+    RootPath, TemporaryFilePath: String;
+        RzLauncher:  TRzLauncher;
+    SourceSubdirectoryList: TStringList;
+  private
+    { private declarations }
   end;
 
 var
@@ -50,9 +53,8 @@ var
   listFile: TextFile;
   closeCmd, doCopy: boolean;
   copiedFiles, sourceIdx, skippedFiles: integer;
-  closeStr, driveStr, listFilePath,  operationOption,
-    processingOption, rootPath, executablePath, tmpPath, tmpStr: string;
-  sourceFolderList: TStringList;
+  closeStr, driveStr, operationOption, processingOption, executablePath,
+    tmpPath, tmpStr: string;
 begin
   memoOutput.lines.Append('Validating process configuration');
   doCopy := true;
@@ -89,44 +91,33 @@ begin
       [executablePath]));
   end;
 
-  // Root Directory
-  rootPath := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-    keyRootDirectory);
-  if Length(rootPath) > 0 then begin
-    memoOutput.lines.Append(Format('Root Path: %s', [rootPath]));
-    if not DirectoryExists(rootPath) then begin
-      ErrorOutput(Format('Path "%s" does not exist', [rootPath]));
+  // Root Path
+  if Length(RootPath) > 0 then begin
+    memoOutput.lines.Append(Format('Root Path: %s', [RootPath]));
+    if not DirectoryExists(RootPath) then begin
+      ErrorOutput(Format('Path "%s" does not exist', [RootPath]));
       doCopy := false;
     end;
   end;
 
   // Source Directories
-  sourceFolderList := TStringList.Create();
-  tmpStr := ReadRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
-    keySourceDirectories);
-  if Length(tmpStr) > 0 then begin
-    Split(';', tmpStr, sourceFolderList);
-    memoOutput.lines.Append(Format('Source folders: %d',
-      [sourceFolderList.Count]));
-    if sourceFolderList.Count < 1 then begin
-      ErrorOutput('You must define at least one Source Folder location');
-      doCopy := false;
-    end;
-  end else begin
-    ErrorOutput('You must define at least one Source Folder location');
+  memoOutput.lines.Append(Format('Source diretcories: %d',
+    [SourceSubdirectoryList.Count]));
+  if SourceSubdirectoryList.Count < 1 then begin
+    ErrorOutput('You must define at least one Source directory');
     doCopy := false;
   end;
 
   if doCopy then begin
     // create the list file
-    listFilePath := TPath.GetTempFileName();
     memoOutput.lines.Append(Format('Creating temporary file: %s',
-      [listFilePath]));
-    AssignFile(listFile, listFilePath);
+      [TemporaryFilePath]));
+    AssignFile(listFile, TemporaryFilePath);
     ReWrite(listFile);
     // now start populating it
-    for sourceIdx := 0 to sourceFolderList.Count - 1 do begin
-      tmpPath := TPath.Combine(rootPath, sourceFolderList.strings[sourceIdx]);
+    for sourceIdx := 0 to SourceSubdirectoryList.Count - 1 do begin
+      tmpPath := TPath.Combine(RootPath, SourceSubdirectoryList.strings
+        [sourceIdx]);
       // does the file exist?
       if DirectoryExists(tmpPath) then begin
         // write it to the file
@@ -137,7 +128,6 @@ begin
         WarnOutput(Format('Path does not exist (%s)', [tmpPath]));
         inc(skippedFiles);
       end;
-
     end;
     CloseFile(listFile);
 
@@ -161,8 +151,9 @@ begin
       // now launch Teracopy and pass in the file
       memoOutput.lines.Append('Launching TeraCopy');
       RzLauncher.fileName := executablePath;
-      tmpStr := Format('%s *"%s" "%s" %s %s', [operationOption, listFilePath,
-        driveStr, processingOption, closeStr]);
+      tmpStr := Format('%s *"%s" "%s" %s %s',
+        [operationOption, TemporaryFilePath, driveStr, processingOption,
+        closeStr]);
       memoOutput.lines.Append(Format('TeraCopy command line parameters: %s',
         [tmpStr]));
       RzLauncher.Parameters := tmpStr;
@@ -172,8 +163,17 @@ begin
     end;
   end;
 
-  sourceFolderList.Free;
   ProcessingDialogButtons.EnableCancel := true;
+end;
+
+procedure TfrmProcessing.FormCreate(Sender: TObject);
+begin
+  SourceSubdirectoryList := TStringList.Create;
+end;
+
+procedure TfrmProcessing.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  SourceSubdirectoryList.Free;
 end;
 
 end.

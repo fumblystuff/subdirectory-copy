@@ -15,6 +15,8 @@ object frmProcessing: TfrmProcessing
   Font.Style = []
   Position = poOwnerFormCenter
   OnActivate = FormActivate
+  OnClose = FormClose
+  OnCreate = FormCreate
   TextHeight = 15
   object memoOutput: TRzMemo
     Left = 0
@@ -39,12 +41,5 @@ object frmProcessing: TfrmProcessing
     TabOrder = 1
     ExplicitTop = 397
     ExplicitWidth = 622
-  end
-  object RzLauncher: TRzLauncher
-    Action = 'Open'
-    Timeout = -1
-    WaitType = wtProcessMessages
-    Left = 80
-    Top = 72
   end
 end
