@@ -3,9 +3,6 @@
 ## Open Tasks
 
 - [ ] Video recording
-- [ ] Publish v1.1 binary
-- [ ] Publish static site update
-- [ ] Publish docs update
 - [ ] Blog post
 
 ## Future Tasks

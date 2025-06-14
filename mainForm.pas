@@ -65,36 +65,36 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure btnAddSourceDirectoryClick(Sender: TObject);
-    procedure btnRemoveSourceDirectoryClick(Sender: TObject);
-    procedure ActionSourceItemSelectionChangeExecute(Sender: TObject);
     procedure FormResize(Sender: TObject);
-    procedure btnClearSourceDirectoriesClick(Sender: TObject);
-    procedure btnStartClick(Sender: TObject);
-    procedure btnCloseClick(Sender: TObject);
-    procedure editRootPathButtonClick(Sender: TObject);
-    procedure editRootPathChange(Sender: TObject);
-    procedure RzStatusPaneCopyrightClick(Sender: TObject);
-    procedure menuSettingsClick(Sender: TObject);
-    procedure menuDocumentationClick(Sender: TObject);
-    procedure RzDialogButtonsMainClickCancel(Sender: TObject);
-    procedure RzDialogButtonsMainClickOk(Sender: TObject);
-    procedure menuAboutClick(Sender: TObject);
-    procedure menuNewClick(Sender: TObject);
-    procedure menuOpenClick(Sender: TObject);
-    procedure menuSaveClick(Sender: TObject);
-    procedure menuSaveAsClick(Sender: TObject);
-    procedure SetSourceFolderCaption;
-    procedure OpenSettingsDialog;
-    procedure PromptSaveProject;
-    procedure OpenProject;
+    procedure ActionSourceItemSelectionChangeExecute(Sender: TObject);
     procedure AddRecentProject;
-    procedure RemoveRecentProject(ProjectPath: String);
-    procedure UpdateRecentProjectsMenu;
+    procedure btnAddSourceDirectoryClick(Sender: TObject);
+    procedure btnClearSourceDirectoriesClick(Sender: TObject);
+    procedure btnCloseClick(Sender: TObject);
+    procedure btnRemoveSourceDirectoryClick(Sender: TObject);
+    procedure btnStartClick(Sender: TObject);
     procedure CheckOpenSettings;
     procedure DeleteTemporaryFile;
+    procedure editRootPathButtonClick(Sender: TObject);
+    procedure editRootPathChange(Sender: TObject);
+    procedure menuAboutClick(Sender: TObject);
+    procedure menuDocumentationClick(Sender: TObject);
+    procedure menuNewClick(Sender: TObject);
+    procedure menuOpenClick(Sender: TObject);
+    procedure menuSaveAsClick(Sender: TObject);
+    procedure menuSaveClick(Sender: TObject);
+    procedure menuSettingsClick(Sender: TObject);
+    procedure OpenProject;
+    procedure OpenSettingsDialog;
+    procedure PromptSaveProject;
+    procedure RemoveRecentProject(ProjectPath: String);
+    procedure RzDialogButtonsMainClickCancel(Sender: TObject);
+    procedure RzDialogButtonsMainClickOk(Sender: TObject);
+    procedure RzStatusPaneCopyrightClick(Sender: TObject);
     procedure setButtonState;
     procedure SetFormCaption;
+    procedure SetSourceFolderCaption;
+    procedure UpdateRecentProjectsMenu;
   private
     procedure SaveProject;
     procedure RecentProjectClick(Sender: TObject);
@@ -276,8 +276,8 @@ begin
       end;
     end;
     SetFormCaption;
-    setButtonState;
     SetSourceFolderCaption;
+    setButtonState;
     ProjectChanged := False;
   end;
 end;
@@ -313,7 +313,7 @@ var
 begin
   if ProjectChanged then begin
     if Length(ProjectPath) > 0 then begin
-      tmpMsg := Format('Save changes to the "%s" project?',
+      tmpMsg := Format('Save changes to project "%s"?',
         [TPath.GetFileNameWithoutExtension(ProjectPath)]);
     end else begin
       tmpMsg := 'Save changes to the project?';
@@ -466,7 +466,6 @@ begin
     ProjectPath := RzSaveDialog.FileName;
     SaveProject;
     SetFormCaption;
-    AddRecentProject;
   end;
 end;
 

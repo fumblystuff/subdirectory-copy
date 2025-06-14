@@ -205,7 +205,7 @@ object frmMain: TfrmMain
   end
   object RzSelectFolderDialog: TRzSelectFolderDialog
     FormPosition = poMainFormCenter
-    Left = 232
+    Left = 248
     Top = 168
   end
   object ActionList: TActionList
@@ -296,7 +296,7 @@ object frmMain: TfrmMain
     Title = 'Open SubCopy Project'
     Filter = 'SubCopy Project|*.scpy'
     FormPosition = poMainFormCenter
-    Left = 128
+    Left = 136
     Top = 168
   end
   object RzRegApp: TRzRegIniFile
