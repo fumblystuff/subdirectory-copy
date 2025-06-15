@@ -13,10 +13,12 @@ uses
 
 {$R *.res}
 
+
 begin
   // only allow one instance of the application
-  if not JclAppInstances.CheckInstance(1) then
+  if not JclAppInstances.CheckInstance(1) then begin
     Halt;
+  end;
 
   // continue with qpplication initialization
   Application.Initialize;
@@ -24,4 +26,5 @@ begin
   Application.Title := 'SubCopy';
   Application.CreateForm(TfrmMain, frmMain);
   Application.Run;
+
 end.
