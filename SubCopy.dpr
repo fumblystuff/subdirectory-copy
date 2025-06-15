@@ -2,17 +2,23 @@ program SubCopy;
 
 uses
   Vcl.Forms,
-  mainForm in 'mainForm.pas' {frmMain},
+  JclAppInst,
+  mainForm in 'mainForm.pas' {frmMain} ,
   utils in 'utils.pas',
-  settingsForm in 'settingsForm.pas' {frmSettings},
-  startForm in 'startForm.pas' {frmStart},
+  settingsForm in 'settingsForm.pas' {frmSettings} ,
+  startForm in 'startForm.pas' {frmStart} ,
   globals in 'globals.pas',
-  processingForm in 'processingForm.pas' {frmProcessing},
+  processingForm in 'processingForm.pas' {frmProcessing} ,
   aboutForm in 'aboutForm.pas' {frmAbout};
 
 {$R *.res}
 
 begin
+  // only allow one instance of the application
+  if not JclAppInstances.CheckInstance(2) then
+    Halt;
+
+  // continue with qpplication initialization
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'SubCopy';
