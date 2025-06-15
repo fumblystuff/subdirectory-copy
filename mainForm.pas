@@ -8,7 +8,7 @@ uses
   // CodesiteLogging,
 
   JclFileUtils, JvExStdCtrls, JvCombobox, JvDriveCtrls, jclSysInfo, JvBaseDlg,
-  JvWinDialogs,
+  JvWinDialogs, JclAppInst,
 
   RzPanel, RzDlgBtn, RzEdit, RzBtnEdt, RzLabel, RzCommon, RzForms,
   RzStatus, RzLaunch, RzShellDialogs, RzButton, RzLstBox, RzFilSys,
@@ -94,6 +94,8 @@ type
     procedure SetFormCaption;
     procedure SetSourceFolderCaption;
     procedure UpdateRecentProjectsMenu;
+    // single instance handling
+    procedure WndProc(var Msg: TMessage); override;
   private
     procedure SaveProject;
     procedure RecentProjectClick(Sender: TObject);
@@ -587,6 +589,22 @@ begin
   SetSourceFolderCaption;
   setButtonState;
   frmMain.Cursor := crDefault;
+end;
+
+procedure TfrmMain.WndProc(var Msg: TMessage);
+begin
+  if Msg.Msg = JclAppInstances.MessageId then begin
+    case Msg.WParam of
+      AI_INSTANCECREATED:
+        ShowMessage('Another instance created, PID: ' + IntToStr(Msg.LParam));
+      AI_INSTANCEDESTROYED:
+        ShowMessage('Another instance destroyed, PID: ' + IntToStr(Msg.LParam));
+      AI_USERMSG:
+        ShowMessage('User message received from another instance, Data: ' +
+          IntToStr(Msg.LParam));
+    end;
+  end;
+  inherited WndProc(Msg);
 end;
 
 // =============================================================

@@ -15,7 +15,7 @@ uses
 
 begin
   // only allow one instance of the application
-  if not JclAppInstances.CheckInstance(2) then
+  if not JclAppInstances.CheckInstance(1) then
     Halt;
 
   // continue with qpplication initialization
