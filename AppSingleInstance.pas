@@ -24,7 +24,7 @@ uses
 
   globals,
 
-  Dialogs, SysUtils;
+  System.SysUtils, System.UITypes, VCL.Dialogs;
 
 function SendParamsToPrevInst(AppWindow: HWND): Boolean;
 var
@@ -34,7 +34,7 @@ var
   Data: PChar;
   PData: PChar;
 begin
-  Result := False;
+//  Result := False;
   CharCount := 0;
   for idx := 1 to ParamCount do
     Inc(CharCount, Length(ParamStr(idx)) + 1);

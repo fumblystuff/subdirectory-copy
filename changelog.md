@@ -1,6 +1,11 @@
 # Changelog
 
-## 20250615 V1.1.0
+## 20250618 V1.1.2
+
+* Added support for passing a project file path to the application as a runtime parameter. When a shortcut loads with this parameter, the application automatically opens the specific project at startup.
+* Restricted the application to a single instance. When a user launches a second instance, the instance transfers to the initial instance then terminates the second instance. 
+
+## 20250615 V1.1.1
 
 + Enhanced the application to allow users to save projects to disk and switch between them (open project).
 + Added **About** dialog

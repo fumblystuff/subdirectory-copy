@@ -14,9 +14,6 @@ uses
 
 procedure MessageDialogCentered(msg: String);
 function MessageConfirmationCentered(headerText, msg: String): boolean;
-function CheckRegistryValue(rootKey: HKEY; key, value: string): boolean;
-procedure RenameRegistryValue(rootKey: HKEY; key, oldValue, newValue: string);
-procedure DeleteRegistryValue(rootKey: HKEY; key, value: String);
 function ReadRegistryBool(rootKey: HKEY; key, valueName: String;
   defaultValue: boolean = false): boolean;
 function ReadRegistryString(rootKey: HKEY; key, valueName: String;
@@ -68,42 +65,6 @@ begin
   f.Position := poOwnerFormCenter;
   f.ShowModal;
   Result := f.ModalResult = mrYes;
-end;
-
-function CheckRegistryValue(rootKey: HKEY; key, value: string): boolean;
-begin
-  Result := false;
-  Reg.rootKey := rootKey;
-  if Reg.KeyExists(key) then begin
-    if Reg.OpenKey(key, false) then begin
-      Result := Reg.ValueExists(value);
-    end;
-  end;
-end;
-
-procedure DeleteRegistryValue(rootKey: HKEY; key, value: String);
-begin
-  Reg.rootKey := rootKey;
-  if Reg.KeyExists(key) then begin
-    if Reg.OpenKey(key, true) then begin
-      if Reg.ValueExists(value) then begin
-        Reg.DeleteValue(value);
-      end;
-      Reg.CloseKey;
-    end;
-  end;
-end;
-
-procedure RenameRegistryValue(rootKey: HKEY; key, oldValue, newValue: string);
-begin
-  Reg.rootKey := rootKey;
-  if Reg.KeyExists(key) then begin
-    if Reg.OpenKey(key, false) then begin
-      if Reg.ValueExists(oldValue) then begin
-        Reg.RenameValue(oldValue, newValue);
-      end;
-    end;
-  end;
 end;
 
 function ReadRegistryBool(rootKey: HKEY; key, valueName: String;
