@@ -84,7 +84,7 @@ type
     procedure menuSaveAsClick(Sender: TObject);
     procedure menuSaveClick(Sender: TObject);
     procedure menuSettingsClick(Sender: TObject);
-    procedure OpenProject;
+    procedure OpenProject(tmpProjectPath: string);
     procedure OpenSettingsDialog;
     procedure PromptSaveProject;
     procedure RecentProjectClick(Sender: TObject);
@@ -98,11 +98,10 @@ type
     procedure SetSourceFolderCaption;
     procedure UpdateRecentProjectsMenu;
   private
-    procedure ProcessParam(const Param: string);
     procedure UMEnsureRestored(var Msg: TMessage); message UM_ENSURERESTORED;
     procedure WMCopyData(var Msg: TWMCopyData); message WM_COPYDATA;
   public
-    { public declarations here }
+    { public declarations }
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure WMDropFiles(var Msg: TWMDropFiles); message WM_DROPFILES;
@@ -112,17 +111,12 @@ var
   frmMain: TfrmMain;
   MenuItems: array [0 .. 5] of TMenuItem;
   RecentProjects: TStringList;
-  ProjectChanged: Boolean;
+  isCopying, ProjectChanged: Boolean;
   ProjectPath, TemporaryFilePath: string;
 
 implementation
 
 {$R *.dfm}
-
-procedure TfrmMain.ProcessParam(const Param: string);
-begin
-  Codesite.Send('Parameter', Param);
-end;
 
 procedure TfrmMain.CreateParams(var Params: TCreateParams);
 begin
@@ -144,17 +138,35 @@ procedure TfrmMain.WMCopyData(var Msg: TWMCopyData);
 var
   PData: PChar;
   Param: string;
+  ParamList: TStringList;
 begin
   Codesite.Send('WMCopyData');
+  ParamList := TStringList.Create;
   if Msg.CopyDataStruct.dwData <> cCopyDataWaterMark then
     raise Exception.Create('Invalid data structure passed in WM_COPYDATA');
   PData := Msg.CopyDataStruct.lpData;
   while PData^ <> #0 do begin
     Param := PData;
-    ProcessParam(Param);
+    ParamList.Add(Param); // add the parameter to the list
     Inc(PData, Length(Param) + 1);
   end;
   Msg.Result := 1;
+
+  // Do we have any command-line options?
+  if ParamList.Count > 0 then begin
+    // see if it points to a valid file
+    Param := ParamList.Strings[0]; // reusing this variable
+    if FileExists(Param) then begin
+      // Is the Copy dialog open?
+      if isCopying then begin
+        MessageDialogCentered
+          ('Unable to open Project while copy dialog is open.');
+      end else begin
+        OpenProject(Param);
+      end;
+    end;
+  end;
+  ParamList.Free;
 end;
 
 function CreatePathStr(pathList: TStrings): string;
@@ -240,7 +252,7 @@ begin
   menuRecent.Enabled := RecentProjects.Count > 0;
   For idx := 0 to RecentProjects.Count - 1 do begin
     MenuItems[idx] := TMenuItem.Create(Self);
-    MenuItems[idx].Caption := RecentProjects.strings[idx];
+    MenuItems[idx].Caption := RecentProjects.Strings[idx];
     MenuItems[idx].OnClick := RecentProjectClick;
     menuRecent.Add(MenuItems[idx]);
   end;
@@ -266,8 +278,7 @@ begin
   PromptSaveProject;
 
   if FileExists(tmpPath) then begin
-    ProjectPath := tmpPath;
-    OpenProject;
+    OpenProject(tmpPath);
   end else begin
     MessageDialogCentered(Format('Selected Project does not exist (%s)',
       [tmpPath]));
@@ -285,15 +296,26 @@ begin
   end;
 end;
 
-procedure TfrmMain.OpenProject;
+procedure TfrmMain.OpenProject(tmpProjectPath: string);
 var
   idx, tmpIdx: Integer;
-  strings: TStringList;
+  Strings: TStringList;
   folderName, tmpStr: String;
 begin
-  if FileExists(ProjectPath) then begin
+  Codesite.Send('Project', tmpProjectPath);
+  if FileExists(tmpProjectPath) then begin
+    // does the file have the right file extension?
+    tmpStr := TPath.GetExtension(tmpProjectPath);
+    if not(tmpStr = ProjectExtension) then begin
+      MessageDialogCentered(Format('Invalid project file extension: "%s"',
+        [tmpStr]));
+      Exit;
+    end;
+    // we have a good file, so save it as the current project path
+    ProjectPath := tmpProjectPath;
     SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProjectPath,
       ProjectPath);
+
     AddRecentProject;
     // clear the UI
     editRootPath.Clear;
@@ -303,11 +325,11 @@ begin
     // Root directory
     editRootPath.text := RzIniProject.ReadString(keyRoot, keyRootDirectory, '');
     // Source Directories
-    strings := TStringList.Create();
-    RzIniProject.ReadSectionValues(keySource, strings);
-    if strings.Count > 0 then begin
-      for idx := 0 to strings.Count - 1 do begin
-        tmpStr := strings[idx];
+    Strings := TStringList.Create();
+    RzIniProject.ReadSectionValues(keySource, Strings);
+    if Strings.Count > 0 then begin
+      for idx := 0 to Strings.Count - 1 do begin
+        tmpStr := Strings[idx];
         tmpIdx := tmpStr.IndexOf('=');
         if tmpIdx > -1 then begin
           folderName := Copy(tmpStr, tmpIdx + 2, 99);
@@ -331,7 +353,7 @@ var
 begin
   if ProjectPath.IsEmpty then begin
     if RzSaveDialog.Execute then begin
-      ProjectPath := RzSaveDialog.FileName;
+      ProjectPath := RzSaveDialog.fileName;
     end else begin
       Exit;
     end;
@@ -391,6 +413,7 @@ var
   i: Integer;
 begin
   PromptSaveProject;
+  isCopying := True;
   startForm := TfrmStart.Create(nil);
   startForm.ShowModal;
   if startForm.ModalResult = mrOk then begin
@@ -400,19 +423,20 @@ begin
     // Assign subdirectory list
     for i := 0 to listSourceDirectories.items.Count - 1 do begin
       processingForm.SourceSubdirectoryList.Add
-        (listSourceDirectories.items.strings[i])
+        (listSourceDirectories.items.Strings[i])
     end;
     processingForm.TemporaryFilePath := TemporaryFilePath;
     processingForm.RzLauncher := RzLauncher;
     processingForm.ShowModal;
     processingForm.Free;
   end;
+  isCopying := False;
   startForm.Free;
 end;
 
 procedure TfrmMain.RzStatusPaneCopyrightClick(Sender: TObject);
 begin
-  RzLauncher.FileName := FumblyURL;
+  RzLauncher.fileName := FumblyURL;
   RzLauncher.Launch;
 end;
 
@@ -506,7 +530,7 @@ procedure TfrmMain.menuSaveAsClick(Sender: TObject);
 begin
   // Prompt for the new project file
   if RzSaveDialog.Execute then begin
-    ProjectPath := RzSaveDialog.FileName;
+    ProjectPath := RzSaveDialog.fileName;
     SaveProject;
     SetFormCaption;
   end;
@@ -530,8 +554,7 @@ procedure TfrmMain.menuOpenClick(Sender: TObject);
 begin
   PromptSaveProject;
   if RzOpenDialog.Execute then begin
-    ProjectPath := RzOpenDialog.FileName;
-    OpenProject;
+    OpenProject(RzOpenDialog.fileName);
   end;
 end;
 
@@ -548,7 +571,7 @@ end;
 
 procedure TfrmMain.menuDocumentationClick(Sender: TObject);
 begin
-  RzLauncher.FileName := DocsURL;
+  RzLauncher.fileName := DocsURL;
   RzLauncher.Launch;
 end;
 
@@ -649,6 +672,7 @@ begin
   RzSaveDialog.InitialDir := TPath.GetDocumentsPath;
   ProjectPath := '';
   TemporaryFilePath := FileGetTempName('scp');
+  isCopying := False;
 
   // Populate the Recent Projects submenu
   RecentProjects := TStringList.Create();
@@ -666,8 +690,7 @@ begin
     // Grab the first parameter
     tmpPath := ParamStr(1);
     if FileExists(tmpPath) then begin
-      ProjectPath := tmpPath;
-      OpenProject;
+      OpenProject(tmpPath);
       Exit;
     end;
   end;
@@ -677,8 +700,7 @@ begin
     keyProjectPath, '');
   if not tmpPath.IsEmpty then begin
     if FileExists(tmpPath) then begin
-      ProjectPath := tmpPath;
-      OpenProject;
+      OpenProject(tmpPath);
     end;
   end;
 end;

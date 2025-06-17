@@ -5,6 +5,7 @@ interface
 const
   AppName = 'Subdirectory Copy';
   AppWindowName = 'subcopy.fumblydiddle.com';
+  ProjectExtension = '.scpy';
   // paths
   AppRegistryKey = 'Software\Fumbly Diddle\Subdirectory Copy';
   TeraCopyDefaultPath = 'C:\Program Files\TeraCopy\TeraCopy.exe';
