@@ -5,10 +5,6 @@
 - [ ] Video recording
 - [ ] Blog post
 
-## Future Tasks
-
-- [ ] Block secondary instances from running
-
 ## Introduction
 
 Have you ever needed to copy a subset of a directory's subdirectories to a flash drive? This application allows you to do that. 
