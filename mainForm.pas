@@ -6,7 +6,7 @@ uses
   aboutForm, AppSingleInstance, globals, processingForm, settingsForm,
   startForm, utils,
 
-  CodesiteLogging,
+//  CodesiteLogging,
 
   JclFileUtils, JvExStdCtrls, JvCombobox, JvDriveCtrls, jclSysInfo, JvBaseDlg,
   JvWinDialogs, JclAppInst,
@@ -140,7 +140,6 @@ var
   Param: string;
   ParamList: TStringList;
 begin
-  Codesite.Send('WMCopyData');
   ParamList := TStringList.Create;
   if Msg.CopyDataStruct.dwData <> cCopyDataWaterMark then
     raise Exception.Create('Invalid data structure passed in WM_COPYDATA');
@@ -159,8 +158,9 @@ begin
     if FileExists(Param) then begin
       // Is the Copy dialog open?
       if isCopying then begin
-        MessageDialogCentered
-          ('Unable to open Project while copy dialog is open.');
+        MessageDialogCentered('Launched project from through a second ' +
+          'instance. Aborted, unable to open Project while copy dialog ' +
+          'is open.');
       end else begin
         OpenProject(Param);
       end;
@@ -302,7 +302,6 @@ var
   Strings: TStringList;
   folderName, tmpStr: String;
 begin
-  Codesite.Send('Project', tmpProjectPath);
   if FileExists(tmpProjectPath) then begin
     // does the file have the right file extension?
     tmpStr := TPath.GetExtension(tmpProjectPath);
@@ -686,7 +685,6 @@ begin
   // if we have a command-line parameter and the specified file exists
   // then launch it
   if ParamCount > 0 then begin
-    Codesite.Send('We have runtime parameters');
     // Grab the first parameter
     tmpPath := ParamStr(1);
     if FileExists(tmpPath) then begin
