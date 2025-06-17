@@ -1,23 +1,26 @@
 program SubCopy;
 
 uses
+  CodesiteLogging,
+
   Vcl.Forms,
-  JclAppInst,
+  Vcl.Dialogs,
+  Messages,
+  Windows,
   mainForm in 'mainForm.pas' {frmMain} ,
-  utils in 'utils.pas',
   settingsForm in 'settingsForm.pas' {frmSettings} ,
   startForm in 'startForm.pas' {frmStart} ,
-  globals in 'globals.pas',
   processingForm in 'processingForm.pas' {frmProcessing} ,
-  aboutForm in 'aboutForm.pas' {frmAbout};
+  aboutForm in 'aboutForm.pas' {frmAbout} ,
+  AppSingleInstance in 'AppSingleInstance.pas',
+  globals in 'globals.pas', utils in 'utils.pas';
 
 {$R *.res}
 
-
 begin
-  // only allow one instance of the application
-  if not JclAppInstances.CheckInstance(1) then begin
-    Halt;
+
+  if not LaunchInstance then begin
+    halt;
   end;
 
   // continue with qpplication initialization

@@ -1,26 +1,32 @@
 unit AppSingleInstance;
 
+// Source: How to run a single instance of an application
+// https://delphidabbler.com/articles/article-13
+
 interface
 
 uses
-  Windows, Messages;
+
+  Messages, Windows;
 
 const
-  AppWindowName = 'SingleInstance.johnwargo.com';
   // Any 32 bit number here to perform check on copied data
   cCopyDataWaterMark = $DE1F1DAB;
   // User window message handled by main form ensures that
   // app not minimized or hidden and is in foreground
   UM_ENSURERESTORED = WM_USER + 1;
 
-function SwitchToPrevInst(Wdw: HWND): Boolean;
+function LaunchInstance: Boolean;
 
 implementation
 
 uses
-   SysUtils;
 
-function SendParamsToPrevInst(Wdw: HWND): Boolean;
+  globals,
+
+  Dialogs, SysUtils;
+
+function SendParamsToPrevInst(AppWindow: HWND): Boolean;
 var
   CopyData: TCopyDataStruct;
   idx: Integer;
@@ -28,7 +34,6 @@ var
   Data: PChar;
   PData: PChar;
 begin
-  // Initialize this here so we have a determined result
   Result := False;
   CharCount := 0;
   for idx := 1 to ParamCount do
@@ -45,27 +50,44 @@ begin
     CopyData.lpData := Data;
     CopyData.cbData := CharCount * SizeOf(Char);
     CopyData.dwData := cCopyDataWaterMark;
-    Result := SendMessage(Wdw, WM_COPYDATA, 0, LPARAM(@CopyData)) = 1;
+    Result := SendMessage(AppWindow, WM_COPYDATA, 0, LPARAM(@CopyData)) = 1;
   finally
     StrDispose(Data);
   end;
 end;
 
-function SwitchToPrevInst(Wdw: HWND): Boolean;
+function SwitchToPrevInst(AppWindow: HWND): Boolean;
 begin
-  Assert(Wdw <> 0);
-  // Again, initialize this here so we have a determined result
+  Assert(AppWindow <> 0);
   Result := True;
   // Do we have any runtime parameters?
   if ParamCount > 0 then begin
     // then send them to the existing application instance
-    Result := SendParamsToPrevInst(Wdw);
+    Result := SendParamsToPrevInst(AppWindow);
   end;
   if Result then begin
     // Switch to the existing app window
     // this skips only if sending parameters fails
-    SendMessage(Wdw, UM_ENSURERESTORED, 0, 0);
+    SendMessage(AppWindow, UM_ENSURERESTORED, 0, 0);
+  end;
+end;
+
+function LaunchInstance: Boolean;
+var
+  AppWindow: HWND;
+
+begin
+  Result := True;
+  AppWindow := FindWindow(AppWindowName, nil);
+  // if this is the only instance, AppWindow will be 0
+  if AppWindow <> 0 then begin
+    Result := False;
+    if not SwitchToPrevInst(AppWindow) then begin
+      MessageDlg('Unable to activate existing application instance',
+        mtInformation, [mbOk], 0, mbOk);
+    end;
   end;
 end;
 
 end.
+

@@ -3,9 +3,10 @@ unit mainForm;
 interface
 
 uses
-  aboutForm, globals, processingForm, settingsForm, startForm, utils,
+  aboutForm, AppSingleInstance, globals, processingForm, settingsForm,
+  startForm, utils,
 
-  // CodesiteLogging,
+  CodesiteLogging,
 
   JclFileUtils, JvExStdCtrls, JvCombobox, JvDriveCtrls, jclSysInfo, JvBaseDlg,
   JvWinDialogs, JclAppInst,
@@ -86,21 +87,24 @@ type
     procedure OpenProject;
     procedure OpenSettingsDialog;
     procedure PromptSaveProject;
+    procedure RecentProjectClick(Sender: TObject);
     procedure RemoveRecentProject(ProjectPath: String);
     procedure RzDialogButtonsMainClickCancel(Sender: TObject);
     procedure RzDialogButtonsMainClickOk(Sender: TObject);
     procedure RzStatusPaneCopyrightClick(Sender: TObject);
+    procedure SaveProject;
     procedure setButtonState;
     procedure SetFormCaption;
     procedure SetSourceFolderCaption;
     procedure UpdateRecentProjectsMenu;
-    // single instance handling
-    procedure WndProc(var Msg: TMessage); override;
   private
-    procedure SaveProject;
-    procedure RecentProjectClick(Sender: TObject);
+    procedure ProcessParam(const Param: string);
+    procedure UMEnsureRestored(var Msg: TMessage); message UM_ENSURERESTORED;
+    procedure WMCopyData(var Msg: TWMCopyData); message WM_COPYDATA;
   public
+    { public declarations here }
   protected
+    procedure CreateParams(var Params: TCreateParams); override;
     procedure WMDropFiles(var Msg: TWMDropFiles); message WM_DROPFILES;
   end;
 
@@ -114,6 +118,44 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TfrmMain.ProcessParam(const Param: string);
+begin
+  Codesite.Send('Parameter', Param);
+end;
+
+procedure TfrmMain.CreateParams(var Params: TCreateParams);
+begin
+  inherited;
+  StrCopy(Params.WinClassName, AppWindowName);
+end;
+
+procedure TfrmMain.UMEnsureRestored(var Msg: TMessage);
+begin
+  if IsIconic(Application.Handle) then
+    Application.Restore;
+  if not Visible then
+    Visible := True;
+  Application.BringToFront;
+  SetForegroundWindow(Self.Handle);
+end;
+
+procedure TfrmMain.WMCopyData(var Msg: TWMCopyData);
+var
+  PData: PChar;
+  Param: string;
+begin
+  Codesite.Send('WMCopyData');
+  if Msg.CopyDataStruct.dwData <> cCopyDataWaterMark then
+    raise Exception.Create('Invalid data structure passed in WM_COPYDATA');
+  PData := Msg.CopyDataStruct.lpData;
+  while PData^ <> #0 do begin
+    Param := PData;
+    ProcessParam(Param);
+    Inc(PData, Length(Param) + 1);
+  end;
+  Msg.Result := 1;
+end;
 
 function CreatePathStr(pathList: TStrings): string;
 // convert path array to string
@@ -385,10 +427,10 @@ procedure TfrmMain.SetFormCaption;
 begin
   // Put the project name in the form caption
   if ProjectPath.IsEmpty then begin
-    frmMain.Caption := ApplicationName;
+    frmMain.Caption := AppName;
   end else begin
     frmMain.Caption := Format('%s: %s',
-      [ApplicationName, TPath.GetFileNameWithoutExtension(ProjectPath)]);
+      [AppName, TPath.GetFileNameWithoutExtension(ProjectPath)]);
   end;
 
 end;
@@ -591,22 +633,6 @@ begin
   frmMain.Cursor := crDefault;
 end;
 
-procedure TfrmMain.WndProc(var Msg: TMessage);
-begin
-  if Msg.Msg = JclAppInstances.MessageId then begin
-    case Msg.WParam of
-      AI_INSTANCECREATED:
-        ShowMessage('Another instance created, PID: ' + IntToStr(Msg.LParam));
-      AI_INSTANCEDESTROYED:
-        ShowMessage('Another instance destroyed, PID: ' + IntToStr(Msg.LParam));
-      AI_USERMSG:
-        ShowMessage('User message received from another instance, Data: ' +
-          IntToStr(Msg.LParam));
-    end;
-  end;
-  inherited WndProc(Msg);
-end;
-
 // =============================================================
 // Form Lifecycle events
 // =============================================================
@@ -615,11 +641,8 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 var
   tmpPath, tmpStr: String;
 begin
-
-  // Codesite.Clear;
-
   DragAcceptFiles(Handle, True);
-  frmMain.Caption := ApplicationName;
+  frmMain.Caption := AppName;
   RzRegApp.path := AppRegistryKey;
   RzVersionInfo.filePath := Application.ExeName;
   RzOpenDialog.InitialDir := TPath.GetDocumentsPath;
@@ -639,6 +662,7 @@ begin
   // if we have a command-line parameter and the specified file exists
   // then launch it
   if ParamCount > 0 then begin
+    Codesite.Send('We have runtime parameters');
     // Grab the first parameter
     tmpPath := ParamStr(1);
     if FileExists(tmpPath) then begin

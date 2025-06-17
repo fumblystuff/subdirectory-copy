@@ -134,9 +134,9 @@
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Icon_MainIcon>subcopy_icon.ico</Icon_MainIcon>
-        <VerInfo_Keys>CompanyName=Fumbly Diddle Software, LLC;FileDescription=$(MSBuildProjectName);FileVersion=1.1.1.2;InternalName=;LegalCopyright=Copyright 2025 Fumbly Diddle Software;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Fumbly Diddle Software, LLC;FileDescription=$(MSBuildProjectName);FileVersion=1.1.1.3;InternalName=;LegalCopyright=Copyright 2025 Fumbly Diddle Software;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_MinorVer>1</VerInfo_MinorVer>
-        <VerInfo_Build>2</VerInfo_Build>
+        <VerInfo_Build>3</VerInfo_Build>
         <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <ItemGroup>
@@ -145,26 +145,22 @@
         </DelphiCompile>
         <DCCReference Include="mainForm.pas">
             <Form>frmMain</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="utils.pas"/>
         <DCCReference Include="settingsForm.pas">
             <Form>frmSettings</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="startForm.pas">
             <Form>frmStart</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="globals.pas"/>
         <DCCReference Include="processingForm.pas">
             <Form>frmProcessing</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="aboutForm.pas">
             <Form>frmAbout</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="AppSingleInstance.pas"/>
+        <DCCReference Include="globals.pas"/>
+        <DCCReference Include="utils.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

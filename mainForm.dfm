@@ -101,7 +101,7 @@ object frmMain: TfrmMain
     object editRootPath: TRzButtonEdit
       Left = 95
       Top = 10
-      Width = 513
+      Width = 511
       Height = 23
       Text = ''
       Anchors = [akLeft, akTop, akRight]
@@ -110,7 +110,7 @@ object frmMain: TfrmMain
       AltBtnNumGlyphs = 1
       ButtonNumGlyphs = 1
       OnButtonClick = editRootPathButtonClick
-      ExplicitWidth = 511
+      ExplicitWidth = 509
     end
   end
   object RzPanelSource: TRzPanel
@@ -136,7 +136,7 @@ object frmMain: TfrmMain
     object listSourceDirectories: TRzListBox
       Left = 10
       Top = 31
-      Width = 516
+      Width = 514
       Height = 310
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = 2
@@ -148,36 +148,36 @@ object frmMain: TfrmMain
       OnDblClick = btnRemoveSourceDirectoryClick
       OnEnter = ActionSourceItemSelectionChangeExecute
       OnExit = ActionSourceItemSelectionChangeExecute
-      ExplicitWidth = 514
+      ExplicitWidth = 512
       ExplicitHeight = 302
     end
     object btnAddSourceDirectory: TRzButton
-      Left = 535
+      Left = 533
       Top = 31
       Anchors = [akTop, akRight]
       Caption = 'Add'
       TabOrder = 1
       OnClick = btnAddSourceDirectoryClick
-      ExplicitLeft = 533
+      ExplicitLeft = 531
     end
     object btnRemoveSourceDirectory: TRzButton
-      Left = 535
+      Left = 533
       Top = 70
       Anchors = [akTop, akRight]
       Caption = 'Remove'
       Enabled = False
       TabOrder = 2
       OnClick = btnRemoveSourceDirectoryClick
-      ExplicitLeft = 533
+      ExplicitLeft = 531
     end
     object btnClearSourceDirectories: TRzButton
-      Left = 535
+      Left = 533
       Top = 110
       Anchors = [akTop, akRight]
       Caption = 'Clear'
       TabOrder = 3
       OnClick = btnClearSourceDirectoriesClick
-      ExplicitLeft = 533
+      ExplicitLeft = 531
     end
   end
   object RzDialogButtonsMain: TRzDialogButtons
