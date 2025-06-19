@@ -47,21 +47,21 @@ implementation
 procedure TfrmStart.CopyDialogButtonsClickOk(Sender: TObject);
 begin
   if TargetDrive.Drive <> '' then begin
-    SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyTargetDrive,
+    WriteRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyTargetDrive,
       TargetDrive.Drive);
   end;
   // Operation value (command) and Idx
-  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyOperationStr,
+  WriteRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyOperationStr,
     selectOperation.value);
-  SaveRegistryInteger(HKEY_CURRENT_USER, AppRegistryKey, keyOperationIdx,
+  WriteRegistryInteger(HKEY_CURRENT_USER, AppRegistryKey, keyOperationIdx,
     selectOperation.ItemIndex);
   // Processing value (command) and Idx
-  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProcessingStr,
+  WriteRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProcessingStr,
     selectProcessing.value);
-  SaveRegistryInteger(HKEY_CURRENT_USER, AppRegistryKey, keyProcessingIdx,
+  WriteRegistryInteger(HKEY_CURRENT_USER, AppRegistryKey, keyProcessingIdx,
     selectProcessing.ItemIndex);
   // TeraCopy close
-  SaveRegistryBool(HKEY_CURRENT_USER, AppRegistryKey, keyCloseTeraCopy,
+  WriteRegistryBool(HKEY_CURRENT_USER, AppRegistryKey, keyCloseTeraCopy,
     checkCloseTeraCopy.Checked);
 end;
 

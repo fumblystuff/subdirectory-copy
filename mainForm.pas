@@ -195,7 +195,7 @@ begin
     if FileExists(globals.TeraCopyDefaultPath) then begin
       // Yes!
       exePath := globals.TeraCopyDefaultPath;
-      SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
+      WriteRegistryString(HKEY_CURRENT_USER, AppRegistryKey,
         keyExecutable, exePath);
       Exit;
     end;
@@ -239,7 +239,7 @@ begin
     RecentProjects.Delete(5);
   end;
   // Write the recent project list to the registry
-  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyRecentProjects,
+  WriteRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyRecentProjects,
     CreatePathStr(RecentProjects));
   UpdateRecentProjectsMenu;
 end;
@@ -312,7 +312,7 @@ begin
     end;
     // we have a good file, so save it as the current project path
     ProjectPath := tmpProjectPath;
-    SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProjectPath,
+    WriteRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyProjectPath,
       ProjectPath);
 
     AddRecentProject;

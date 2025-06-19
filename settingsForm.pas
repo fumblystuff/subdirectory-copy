@@ -64,7 +64,7 @@ begin
     // see if we can use the default value
     if fileExists(globals.TeraCopyDefaultPath) then begin
       editExecutable.text := globals.TeraCopyDefaultPath;
-      SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyExecutable,
+      WriteRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyExecutable,
         globals.TeraCopyDefaultPath);
     end;
   end;
@@ -77,7 +77,7 @@ end;
 
 procedure TfrmSettings.SettingsDialogButtonsClickOk(Sender: TObject);
 begin
-  SaveRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyExecutable,
+  WriteRegistryString(HKEY_CURRENT_USER, AppRegistryKey, keyExecutable,
     editExecutable.text);
 end;
 

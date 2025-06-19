@@ -61,6 +61,7 @@ object frmStart: TfrmStart
     Width = 376
     CaptionOk = '&Copy'
     OnClickOk = CopyDialogButtonsClickOk
+    Color = 15987699
     TabOrder = 0
     ExplicitTop = 147
     ExplicitWidth = 374

@@ -14,20 +14,21 @@ uses
 
 procedure MessageDialogCentered(msg: String);
 function MessageConfirmationCentered(headerText, msg: String): boolean;
+procedure Split(const Delimiter: Char; Input: string;
+  const theStrings: TStrings);
+
 function ReadRegistryBool(rootKey: HKEY; key, valueName: String;
   defaultValue: boolean = false): boolean;
 function ReadRegistryString(rootKey: HKEY; key, valueName: String;
   defaultValue: String = ''): String;
 function ReadRegistryInteger(rootKey: HKEY; key, valueName: String;
   defaultValue: integer = 0): integer;
-procedure SaveRegistryBool(rootKey: HKEY; key, valueName: String;
+procedure WriteRegistryBool(rootKey: HKEY; key, valueName: String;
   value: boolean);
-procedure SaveRegistryInteger(rootKey: HKEY; key, valueName: String;
+procedure WriteRegistryInteger(rootKey: HKEY; key, valueName: String;
   value: integer);
-procedure SaveRegistryString(rootKey: HKEY; key, valueName: String;
+procedure WriteRegistryString(rootKey: HKEY; key, valueName: String;
   value: String);
-procedure Split(const Delimiter: Char; Input: string;
-  const theStrings: TStrings);
 
 implementation
 
@@ -82,16 +83,15 @@ begin
   end;
 end;
 
-procedure SaveRegistryBool(rootKey: HKEY; key, valueName: String;
+procedure WriteRegistryBool(rootKey: HKEY; key, valueName: String;
   value: boolean);
 begin
   Reg.rootKey := rootKey;
-  if Reg.KeyExists(key) then begin
-    if Reg.OpenKey(key, true) then begin
-      Reg.WriteBool(valueName, value);
-      Reg.CloseKey;
-    end;
+  if Reg.OpenKey(key, true) then begin
+    Reg.WriteBool(valueName, value);
+    Reg.CloseKey;
   end;
+
 end;
 
 function ReadRegistryInteger(rootKey: HKEY; key, valueName: String;
@@ -109,15 +109,13 @@ begin
   end;
 end;
 
-procedure SaveRegistryInteger(rootKey: HKEY; key, valueName: String;
+procedure WriteRegistryInteger(rootKey: HKEY; key, valueName: String;
   value: integer);
 begin
   Reg.rootKey := rootKey;
-  if Reg.KeyExists(key) then begin
-    if Reg.OpenKey(key, true) then begin
-      Reg.WriteInteger(valueName, value);
-      Reg.CloseKey;
-    end;
+  if Reg.OpenKey(key, true) then begin
+    Reg.WriteInteger(valueName, value);
+    Reg.CloseKey;
   end;
 end;
 
@@ -136,16 +134,14 @@ begin
   end;
 end;
 
-procedure SaveRegistryString(rootKey: HKEY; key, valueName: String;
+procedure WriteRegistryString(rootKey: HKEY; key, valueName: String;
   value: String);
 begin
   Reg.rootKey := rootKey;
-  if Reg.KeyExists(key) then begin
     if Reg.OpenKey(key, true) then begin
       Reg.WriteString(valueName, value);
       Reg.CloseKey;
     end;
-  end;
 end;
 
 initialization

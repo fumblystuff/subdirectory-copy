@@ -35,6 +35,7 @@ object frmSettings: TfrmSettings
     Top = 75
     Width = 464
     OnClickOk = SettingsDialogButtonsClickOk
+    Color = 15987699
     TabOrder = 0
     ExplicitTop = 67
     ExplicitWidth = 462
@@ -42,7 +43,7 @@ object frmSettings: TfrmSettings
   object editExecutable: TRzButtonEdit
     Left = 8
     Top = 31
-    Width = 442
+    Width = 440
     Height = 23
     Text = ''
     Anchors = [akLeft, akTop, akRight]
@@ -50,7 +51,6 @@ object frmSettings: TfrmSettings
     AltBtnNumGlyphs = 1
     ButtonNumGlyphs = 1
     OnButtonClick = editExecutableButtonClick
-    ExplicitWidth = 440
   end
   object FileOpenDialog: TFileOpenDialog
     FavoriteLinks = <>
