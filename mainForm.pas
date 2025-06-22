@@ -6,8 +6,6 @@ uses
   aboutForm, AppSingleInstance, globals, processingForm, settingsForm,
   startForm, utils,
 
-//  CodesiteLogging,
-
   JclFileUtils, JvExStdCtrls, JvCombobox, JvDriveCtrls, jclSysInfo, JvBaseDlg,
   JvWinDialogs, JclAppInst,
 
