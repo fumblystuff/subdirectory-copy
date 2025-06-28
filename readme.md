@@ -24,6 +24,6 @@ The application uses Code Sector's [TeraCopy for Windows](https://www.codesector
 
 ## Demonstration
 
-Here's a demonstration of the application in action
+Here's a demonstration of the application in action; click the image below to launch the video.
 
 [![Subdirectory Copy Demonstration](screenshots/figure-01.png)](https://www.youtube.com/watch?v=sfybxdTEf0k)
