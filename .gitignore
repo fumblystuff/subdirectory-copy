@@ -4,6 +4,8 @@ __recovery/
 Win32/
 Win64
 installer/
+SubCopy Demo.tscproj/
 
 # Files
 sub-copy-folderlist.txt
+SubCopy Demo.mp4
